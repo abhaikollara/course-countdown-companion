@@ -1,59 +1,22 @@
-import { useMemo } from "react";
-import { CalendarClock, GraduationCap } from "lucide-react";
+import { useMemo, useEffect, useState } from "react";
+import { CalendarClock, GraduationCap, Loader2 } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
 
-const scheduleData = {
-  schedules: [
-    {
-      course_name: "General Physics",
-      items: [
-        { item: "Quiz Week 1 & 2", due_date: "2025-12-17T23:59:00" },
-        { item: "Quiz Week 3 & 4", due_date: "2025-12-31T23:59:00" },
-        { item: "Graded Assignment 1", due_date: "2026-01-08T03:24:00" },
-        { item: "Quiz Week 5 & 6", due_date: "2026-01-14T23:59:00" },
-        { item: "Quiz Week 7 & 8", due_date: "2026-01-27T23:59:00" },
-        { item: "Quiz Week 9 & 10", due_date: "2026-02-11T01:54:00" },
-        { item: "Graded Assignment 2", due_date: "2026-02-21T03:24:00" },
-      ],
-    },
-    {
-      course_name: "Command Line Interfaces & Scripting",
-      items: [
-        { item: "Quiz Week 1 & 2", due_date: "2025-12-17T23:59:00" },
-        { item: "Quiz Week 3 & 4", due_date: "2025-12-31T23:59:00" },
-        { item: "Quiz Week 5 & 6", due_date: "2026-01-14T23:59:00" },
-        { item: "Graded Assignment 1", due_date: "2026-01-21T03:24:00" },
-        { item: "Quiz Week 7 & 8", due_date: "2026-01-27T23:59:00" },
-        { item: "Quiz Week 9 & 10", due_date: "2026-02-11T03:25:00" },
-        { item: "Graded Assignment 2", due_date: "2026-02-14T03:25:00" },
-      ],
-    },
-    {
-      course_name: "General Biology",
-      items: [
-        { item: "Quiz Week 1 & 2", due_date: "2025-12-17T23:59:00" },
-        { item: "Quiz Week 3 & 4", due_date: "2025-12-31T23:59:00" },
-        { item: "Graded Assignment 1", due_date: "2026-01-09T04:24:00" },
-        { item: "Quiz Week 5 & 6", due_date: "2026-01-14T23:59:00" },
-        { item: "Quiz Week 7 & 8", due_date: "2026-01-27T23:59:00" },
-        { item: "Graded Assignment 2", due_date: "2026-02-06T04:24:00" },
-        { item: "Quiz Week 9 & 10", due_date: "2026-02-11T23:59:00" },
-      ],
-    },
-    {
-      course_name: "Data Structures & Algorithms",
-      items: [
-        { item: "Quiz Week 1 & 2", due_date: "2025-12-17T23:59:00" },
-        { item: "Quiz Week 3 & 4", due_date: "2025-12-31T23:59:00" },
-        { item: "Quiz Week 5 & 6", due_date: "2026-01-14T23:59:00" },
-        { item: "Quiz Week 7 & 8", due_date: "2026-01-27T23:59:00" },
-        { item: "Graded Assignment 1", due_date: "2026-02-02T03:26:00" },
-        { item: "Graded Assignment 2", due_date: "2026-02-09T03:26:00" },
-        { item: "Quiz Week 9 & 10", due_date: "2026-02-11T23:59:00" },
-      ],
-    },
-  ],
-};
+const SCHEDULE_URL = "https://gist.githubusercontent.com/abhaikollara/ac11036abf3ef43738bb708744d0ff87/raw/5e0d97fdf8b21fbaf9b97b3e52bf8c0fa74196e3/cohort-5-s2-t2.json";
+
+interface ScheduleItem {
+  item: string;
+  due_date: string;
+}
+
+interface Schedule {
+  course_name: string;
+  items: ScheduleItem[];
+}
+
+interface ScheduleData {
+  schedules: Schedule[];
+}
 
 interface DeadlineItem {
   item: string;
@@ -62,7 +25,26 @@ interface DeadlineItem {
 }
 
 const Index = () => {
+  const [scheduleData, setScheduleData] = useState<ScheduleData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(SCHEDULE_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setScheduleData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to load schedule data");
+        setLoading(false);
+      });
+  }, []);
+
   const sortedDeadlines = useMemo(() => {
+    if (!scheduleData) return [];
+    
     const allItems: DeadlineItem[] = [];
 
     scheduleData.schedules.forEach((schedule) => {
@@ -78,7 +60,7 @@ const Index = () => {
     return allItems.sort(
       (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     );
-  }, []);
+  }, [scheduleData]);
 
   const fiveDaysFromNow = new Date().getTime() + 5 * 24 * 60 * 60 * 1000;
   const now = new Date().getTime();
@@ -128,8 +110,22 @@ const Index = () => {
           ))}
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="text-center py-20">
+            <p className="text-destructive">{error}</p>
+          </div>
+        )}
+
         {/* Empty state */}
-        {sortedDeadlines.length === 0 && (
+        {!loading && !error && sortedDeadlines.length === 0 && (
           <div className="text-center py-20">
             <p className="text-muted-foreground">No deadlines found.</p>
           </div>
