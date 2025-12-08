@@ -8,7 +8,6 @@ interface DeadlineCardProps {
   dueDate: string;
   weightage: string;
   openDate: string;
-  countdownTab: "due" | "open";
   index: number;
   highlighted?: boolean;
 }
@@ -44,28 +43,35 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdownTab, index, highlighted }: DeadlineCardProps) => {
-  // Determine which date to use for countdown
-  const targetDate = countdownTab === "open" && openDate && openDate.trim() !== "" ? openDate : dueDate;
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(targetDate));
+const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, index, highlighted }: DeadlineCardProps) => {
+  // Calculate time left for both open and due dates
+  const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() => 
+    openDate && openDate.trim() !== "" ? calculateTimeLeft(openDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
+  );
+  const [dueTimeLeft, setDueTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
 
-  // Update immediately when targetDate changes
+  // Update immediately when dates change
   useEffect(() => {
-    setTimeLeft(calculateTimeLeft(targetDate));
-  }, [targetDate]);
+    if (openDate && openDate.trim() !== "") {
+      setOpenTimeLeft(calculateTimeLeft(openDate));
+    }
+    setDueTimeLeft(calculateTimeLeft(dueDate));
+  }, [openDate, dueDate]);
 
   // Update every second
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(targetDate));
+      if (openDate && openDate.trim() !== "") {
+        setOpenTimeLeft(calculateTimeLeft(openDate));
+      }
+      setDueTimeLeft(calculateTimeLeft(dueDate));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [openDate, dueDate]);
 
-  // Calculate urgency based on due date, not target date
-  const dueDateTimeLeft = calculateTimeLeft(dueDate);
-  const urgency = getUrgencyLevel(dueDateTimeLeft);
+  // Calculate urgency based on due date
+  const urgency = getUrgencyLevel(dueTimeLeft);
   
   // Parse weightage and check if it's high (>= 10%)
   const weightageValue = parseFloat(weightage.replace('%', ''));
@@ -101,6 +107,30 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
     });
   };
 
+  const formatTimeRemaining = (timeLeft: TimeLeft): string => {
+    if (timeLeft.total <= 0) return "Past due";
+    
+    if (timeLeft.days > 0) {
+      if (timeLeft.hours > 0) {
+        return `${timeLeft.days} day${timeLeft.days !== 1 ? "s" : ""}, ${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}`;
+      }
+      return `${timeLeft.days} day${timeLeft.days !== 1 ? "s" : ""}`;
+    }
+    
+    if (timeLeft.hours > 0) {
+      if (timeLeft.minutes > 0) {
+        return `${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}, ${timeLeft.minutes} min${timeLeft.minutes !== 1 ? "s" : ""}`;
+      }
+      return `${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}`;
+    }
+    
+    if (timeLeft.minutes > 0) {
+      return `${timeLeft.minutes} minute${timeLeft.minutes !== 1 ? "s" : ""}`;
+    }
+    
+    return `${timeLeft.seconds} second${timeLeft.seconds !== 1 ? "s" : ""}`;
+  };
+
   return (
     <div
       className={cn(
@@ -118,11 +148,6 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
               <BookOpen className="w-3 h-3" />
               {courseName}
             </span>
-            {isOpenNow && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded text-green-600 bg-green-500/20 border border-green-500/30">
-                Open now
-              </span>
-            )}
             <span className={cn(
               "text-xs font-semibold px-2 py-0.5 rounded",
               isHighWeightage 
@@ -157,17 +182,37 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
             <span className="text-sm font-medium">Past Due</span>
           </div>
         ) : (
-          <div className="flex items-center gap-1 shrink-0">
-            {urgency === "critical" && (
-              <AlertTriangle className="w-4 h-4 text-destructive mr-2 animate-pulse" />
+          <div className="flex flex-col gap-3 shrink-0 items-end">
+            {openDate && openDate.trim() !== "" && (
+              <div className="flex flex-col items-end">
+                {isOpenNow ? (
+                  <>
+                    <span className="text-xs text-muted-foreground mb-1">Status:</span>
+                    <span className="text-sm font-semibold text-green-600">
+                      Open now
+                    </span>
+                  </>
+                ) : openTimeLeft.total > 0 ? (
+                  <>
+                    <span className="text-xs text-muted-foreground mb-1">Opens in:</span>
+                    <span className="text-sm font-semibold text-foreground">
+                      {formatTimeRemaining(openTimeLeft)}
+                    </span>
+                  </>
+                ) : null}
+              </div>
             )}
-            <TimeUnit value={timeLeft.days} label="d" />
-            <span className="text-muted-foreground">:</span>
-            <TimeUnit value={timeLeft.hours} label="h" />
-            <span className="text-muted-foreground">:</span>
-            <TimeUnit value={timeLeft.minutes} label="m" />
-            <span className="text-muted-foreground">:</span>
-            <TimeUnit value={timeLeft.seconds} label="s" />
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-muted-foreground mb-1">Due in:</span>
+              <div className="flex items-center gap-2">
+                {urgency === "critical" && (
+                  <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
+                )}
+                <span className="text-sm font-semibold text-foreground">
+                  {formatTimeRemaining(dueTimeLeft)}
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </div>

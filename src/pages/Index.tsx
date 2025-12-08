@@ -4,7 +4,6 @@ import DeadlineCard from "@/components/DeadlineCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -44,7 +43,6 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [showPastDue, setShowPastDue] = useState(false);
-  const [countdownTab, setCountdownTab] = useState<"due" | "open">("due");
 
   useEffect(() => {
     fetch(SCHEDULE_URL)
@@ -212,16 +210,6 @@ const Index = () => {
                   onCheckedChange={setShowPastDue}
                 />
               </div>
-              <Tabs value={countdownTab} onValueChange={(value) => setCountdownTab(value as "due" | "open")} className="w-auto">
-                <TabsList className="h-8">
-                  <TabsTrigger value="due" className="text-xs px-2 py-1">
-                    Due date
-                  </TabsTrigger>
-                  <TabsTrigger value="open" className="text-xs px-2 py-1">
-                    Start date
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
             </div>
           </div>
         )}
@@ -236,7 +224,6 @@ const Index = () => {
               dueDate={deadline.dueDate}
               weightage={deadline.weightage}
               openDate={deadline.openDate}
-              countdownTab={countdownTab}
               index={index}
               highlighted={isWithinFiveDays(deadline.dueDate)}
             />
