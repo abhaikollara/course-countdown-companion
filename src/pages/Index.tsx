@@ -380,6 +380,16 @@ const Index = () => {
           <p className="text-center text-xs text-muted-foreground">
             Made with ❤️ in God's own country
           </p>
+          <p className="text-center text-xs text-muted-foreground mt-1">
+            <a
+              href="https://abhai.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              abhai.dev
+            </a>
+          </p>
         </footer>
       </div>
     </div>
