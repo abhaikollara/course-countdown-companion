@@ -8,6 +8,7 @@ interface DeadlineCardProps {
   dueDate: string;
   weightage: string;
   openDate: string;
+  countdownTab: "due" | "open";
   index: number;
   highlighted?: boolean;
 }
@@ -43,16 +44,18 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, index, highlighted }: DeadlineCardProps) => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
+const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdownTab, index, highlighted }: DeadlineCardProps) => {
+  // Determine which date to use for countdown
+  const targetDate = countdownTab === "open" && openDate && openDate.trim() !== "" ? openDate : dueDate;
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(targetDate));
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(dueDate));
+      setTimeLeft(calculateTimeLeft(targetDate));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [dueDate]);
+  }, [targetDate]);
 
   const urgency = getUrgencyLevel(timeLeft);
   

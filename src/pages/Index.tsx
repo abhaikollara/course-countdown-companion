@@ -1,9 +1,12 @@
 import { useMemo, useEffect, useState } from "react";
-import { CalendarClock, GraduationCap, Loader2 } from "lucide-react";
+import { CalendarClock, GraduationCap, Loader2, ChevronDown } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const SCHEDULE_URL = "/schedule.json";
@@ -41,6 +44,7 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [showPastDue, setShowPastDue] = useState(false);
+  const [countdownTab, setCountdownTab] = useState<"due" | "open">("due");
 
   useEffect(() => {
     fetch(SCHEDULE_URL)
@@ -164,35 +168,60 @@ const Index = () => {
         {/* Course Filter */}
         {!loading && !error && courseNames.length > 0 && (
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-            <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2">
-              {courseNames.map((courseName) => (
-                <div key={courseName} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={courseName}
-                    checked={selectedCourses.has(courseName)}
-                    onCheckedChange={() => toggleCourse(courseName)}
-                  />
-                  <Label
-                    htmlFor={courseName}
-                    className="text-xs font-normal cursor-pointer text-foreground"
-                  >
-                    {courseName}
-                  </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto justify-between text-xs h-9">
+                  <span>Select courses</span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 p-3" align="start">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Select subjects</Label>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {courseNames.map((courseName) => (
+                      <div key={courseName} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={courseName}
+                          checked={selectedCourses.has(courseName)}
+                          onCheckedChange={() => toggleCourse(courseName)}
+                        />
+                        <Label
+                          htmlFor={courseName}
+                          className="text-sm font-normal cursor-pointer text-foreground flex-1"
+                        >
+                          {courseName}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Label
-                htmlFor="show-past-due"
-                className="text-xs font-medium cursor-pointer text-foreground whitespace-nowrap"
-              >
-                Show past due
-              </Label>
-              <Switch
-                id="show-past-due"
-                checked={showPastDue}
-                onCheckedChange={setShowPastDue}
-              />
+              </PopoverContent>
+            </Popover>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="show-past-due"
+                  className="text-xs font-medium cursor-pointer text-foreground whitespace-nowrap"
+                >
+                  Show past due
+                </Label>
+                <Switch
+                  id="show-past-due"
+                  checked={showPastDue}
+                  onCheckedChange={setShowPastDue}
+                />
+              </div>
+              <Tabs value={countdownTab} onValueChange={(value) => setCountdownTab(value as "due" | "open")} className="w-auto">
+                <TabsList className="h-8">
+                  <TabsTrigger value="due" className="text-xs px-2 py-1">
+                    Due date
+                  </TabsTrigger>
+                  <TabsTrigger value="open" className="text-xs px-2 py-1">
+                    Start date
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
         )}
@@ -207,6 +236,7 @@ const Index = () => {
               dueDate={deadline.dueDate}
               weightage={deadline.weightage}
               openDate={deadline.openDate}
+              countdownTab={countdownTab}
               index={index}
               highlighted={isWithinFiveDays(deadline.dueDate)}
             />
