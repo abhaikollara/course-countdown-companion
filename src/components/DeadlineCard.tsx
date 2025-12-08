@@ -63,11 +63,19 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
     return () => clearInterval(timer);
   }, [targetDate]);
 
-  const urgency = getUrgencyLevel(timeLeft);
+  // Calculate urgency based on due date, not target date
+  const dueDateTimeLeft = calculateTimeLeft(dueDate);
+  const urgency = getUrgencyLevel(dueDateTimeLeft);
   
   // Parse weightage and check if it's high (>= 10%)
   const weightageValue = parseFloat(weightage.replace('%', ''));
   const isHighWeightage = weightageValue >= 10;
+
+  // Check if item is currently open (after open_date and before due_date)
+  const now = new Date().getTime();
+  const isOpenNow = openDate && openDate.trim() !== "" && 
+    new Date(openDate).getTime() <= now && 
+    new Date(dueDate).getTime() > now;
 
   const urgencyStyles = {
     critical: "border-destructive/50 bg-destructive/5",
@@ -110,6 +118,11 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
               <BookOpen className="w-3 h-3" />
               {courseName}
             </span>
+            {isOpenNow && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded text-green-600 bg-green-500/20 border border-green-500/30">
+                Open now
+              </span>
+            )}
             <span className={cn(
               "text-xs font-semibold px-2 py-0.5 rounded",
               isHighWeightage 
