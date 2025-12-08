@@ -138,9 +138,6 @@ const Index = () => {
             <p className="text-lg text-muted-foreground mb-2">
               BITS Pilani via Coursera
             </p>
-            <p className="text-xl font-semibold text-foreground">
-              Quizzes and assignments deadlines
-            </p>
             {scheduleData && (
               <p className="text-sm text-muted-foreground mt-2">
                 Cohort {scheduleData.cohort} • Semester {scheduleData.semester} • Term {scheduleData.term}
