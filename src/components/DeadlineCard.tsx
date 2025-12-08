@@ -74,7 +74,7 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, index, highlighted
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
