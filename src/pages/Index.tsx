@@ -9,6 +9,7 @@ const SCHEDULE_URL = "/schedule.json";
 interface ScheduleItem {
   item: string;
   due_date: string;
+  weightage: string;
 }
 
 interface Schedule {
@@ -17,6 +18,9 @@ interface Schedule {
 }
 
 interface ScheduleData {
+  cohort: number;
+  semester: number;
+  term: number;
   schedules: Schedule[];
 }
 
@@ -24,6 +28,7 @@ interface DeadlineItem {
   item: string;
   courseName: string;
   dueDate: string;
+  weightage: string;
 }
 
 const Index = () => {
@@ -64,6 +69,7 @@ const Index = () => {
           item: item.item,
           courseName: schedule.course_name,
           dueDate: item.due_date,
+          weightage: item.weightage,
         });
       });
     });
@@ -115,9 +121,16 @@ const Index = () => {
             <div className="p-2.5 rounded-xl bg-primary/10 glow-primary">
               <GraduationCap className="w-7 h-7 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Cohort 5 S2 T2 Deadline Tracker
-            </h1>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-foreground">
+                Deadline Tracker
+              </h1>
+              {scheduleData && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Cohort {scheduleData.cohort} • Semester {scheduleData.semester} • Term {scheduleData.term}
+                </p>
+              )}
+            </div>
           </div>
           <p className="text-muted-foreground flex items-center gap-2">
             <CalendarClock className="w-4 h-4" />
@@ -158,6 +171,7 @@ const Index = () => {
               item={deadline.item}
               courseName={deadline.courseName}
               dueDate={deadline.dueDate}
+              weightage={deadline.weightage}
               index={index}
               highlighted={isWithinFiveDays(deadline.dueDate)}
             />

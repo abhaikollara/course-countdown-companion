@@ -6,6 +6,7 @@ interface DeadlineCardProps {
   item: string;
   courseName: string;
   dueDate: string;
+  weightage: string;
   index: number;
   highlighted?: boolean;
 }
@@ -41,7 +42,7 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, index, highlighted }: DeadlineCardProps) => {
+const DeadlineCard = ({ item, courseName, dueDate, weightage, index, highlighted }: DeadlineCardProps) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
 
   useEffect(() => {
@@ -53,6 +54,10 @@ const DeadlineCard = ({ item, courseName, dueDate, index, highlighted }: Deadlin
   }, [dueDate]);
 
   const urgency = getUrgencyLevel(timeLeft);
+  
+  // Parse weightage and check if it's high (>= 10%)
+  const weightageValue = parseFloat(weightage.replace('%', ''));
+  const isHighWeightage = weightageValue >= 10;
 
   const urgencyStyles = {
     critical: "border-destructive/50 bg-destructive/5",
@@ -94,6 +99,14 @@ const DeadlineCard = ({ item, courseName, dueDate, index, highlighted }: Deadlin
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
               <BookOpen className="w-3 h-3" />
               {courseName}
+            </span>
+            <span className={cn(
+              "text-xs font-semibold px-2 py-0.5 rounded",
+              isHighWeightage 
+                ? "text-amber-600 bg-amber-500/20 border border-amber-500/30" 
+                : "text-primary bg-primary/10"
+            )}>
+              {weightage}
             </span>
           </div>
           
