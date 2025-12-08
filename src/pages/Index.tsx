@@ -3,6 +3,7 @@ import { CalendarClock, GraduationCap, Loader2 } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const SCHEDULE_URL = "/schedule.json";
 
@@ -36,6 +37,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
+  const [showPastDue, setShowPastDue] = useState(false);
 
   useEffect(() => {
     fetch(SCHEDULE_URL)
@@ -107,7 +109,18 @@ const Index = () => {
     return time > now && time <= fiveDaysFromNow;
   };
 
-  const upcomingCount = filteredDeadlines.filter((d) => isWithinFiveDays(d.dueDate)).length;
+  const isPastDue = (dueDate: string) => {
+    return new Date(dueDate).getTime() <= now;
+  };
+
+  const filteredDeadlinesWithPastDue = useMemo(() => {
+    if (showPastDue) {
+      return filteredDeadlines;
+    }
+    return filteredDeadlines.filter((deadline) => !isPastDue(deadline.dueDate));
+  }, [filteredDeadlines, showPastDue]);
+
+  const upcomingCount = filteredDeadlinesWithPastDue.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,7 +155,7 @@ const Index = () => {
 
         {/* Course Filter */}
         {!loading && !error && courseNames.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between gap-4">
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {courseNames.map((courseName) => (
                 <div key={courseName} className="flex items-center space-x-2">
@@ -160,12 +173,25 @@ const Index = () => {
                 </div>
               ))}
             </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Label
+                htmlFor="show-past-due"
+                className="text-xs font-medium cursor-pointer text-foreground whitespace-nowrap"
+              >
+                Show past due
+              </Label>
+              <Switch
+                id="show-past-due"
+                checked={showPastDue}
+                onCheckedChange={setShowPastDue}
+              />
+            </div>
           </div>
         )}
 
         {/* Deadline Cards */}
         <div className="space-y-4">
-          {filteredDeadlines.map((deadline, index) => (
+          {filteredDeadlinesWithPastDue.map((deadline, index) => (
             <DeadlineCard
               key={`${deadline.courseName}-${deadline.item}-${deadline.dueDate}`}
               item={deadline.item}
@@ -193,10 +219,12 @@ const Index = () => {
         )}
 
         {/* Empty state */}
-        {!loading && !error && filteredDeadlines.length === 0 && (
+        {!loading && !error && filteredDeadlinesWithPastDue.length === 0 && (
           <div className="text-center py-20">
             <p className="text-muted-foreground">
-              No deadlines found for selected subjects.
+              {showPastDue 
+                ? "No deadlines found for selected subjects." 
+                : "No upcoming deadlines found. Try enabling 'Show past due' to see past deadlines."}
             </p>
           </div>
         )}
