@@ -80,9 +80,15 @@ const Index = () => {
     );
   }, []);
 
-  const upcomingCount = sortedDeadlines.filter(
-    (d) => new Date(d.dueDate).getTime() > new Date().getTime()
-  ).length;
+  const fiveDaysFromNow = new Date().getTime() + 5 * 24 * 60 * 60 * 1000;
+  const now = new Date().getTime();
+  
+  const isWithinFiveDays = (dueDate: string) => {
+    const time = new Date(dueDate).getTime();
+    return time > now && time <= fiveDaysFromNow;
+  };
+
+  const upcomingCount = sortedDeadlines.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,7 +109,7 @@ const Index = () => {
           <p className="text-muted-foreground flex items-center gap-2">
             <CalendarClock className="w-4 h-4" />
             <span>
-              {upcomingCount} upcoming {upcomingCount === 1 ? "deadline" : "deadlines"}
+              {upcomingCount} upcoming {upcomingCount === 1 ? "deadline" : "deadlines"} in the next 5 days
             </span>
           </p>
         </header>
@@ -117,6 +123,7 @@ const Index = () => {
               courseName={deadline.courseName}
               dueDate={deadline.dueDate}
               index={index}
+              highlighted={isWithinFiveDays(deadline.dueDate)}
             />
           ))}
         </div>

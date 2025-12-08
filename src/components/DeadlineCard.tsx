@@ -7,6 +7,7 @@ interface DeadlineCardProps {
   courseName: string;
   dueDate: string;
   index: number;
+  highlighted?: boolean;
 }
 
 interface TimeLeft {
@@ -40,7 +41,7 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, index }: DeadlineCardProps) => {
+const DeadlineCard = ({ item, courseName, dueDate, index, highlighted }: DeadlineCardProps) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
 
   useEffect(() => {
@@ -81,7 +82,8 @@ const DeadlineCard = ({ item, courseName, dueDate, index }: DeadlineCardProps) =
     <div
       className={cn(
         "glass-card rounded-lg p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg animate-fade-in",
-        urgencyStyles[urgency]
+        urgencyStyles[urgency],
+        highlighted && "ring-2 ring-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
       )}
       style={{ animationDelay: `${index * 100}ms` }}
     >
