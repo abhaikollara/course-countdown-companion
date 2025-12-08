@@ -49,6 +49,12 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, countdow
   const targetDate = countdownTab === "open" && openDate && openDate.trim() !== "" ? openDate : dueDate;
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(targetDate));
 
+  // Update immediately when targetDate changes
+  useEffect(() => {
+    setTimeLeft(calculateTimeLeft(targetDate));
+  }, [targetDate]);
+
+  // Update every second
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(targetDate));
