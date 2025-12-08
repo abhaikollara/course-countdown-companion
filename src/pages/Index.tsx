@@ -12,6 +12,7 @@ interface ScheduleItem {
   item: string;
   due_date: string;
   weightage: string;
+  open_date: string;
 }
 
 interface Schedule {
@@ -31,6 +32,7 @@ interface DeadlineItem {
   courseName: string;
   dueDate: string;
   weightage: string;
+  openDate: string;
 }
 
 const Index = () => {
@@ -77,6 +79,7 @@ const Index = () => {
           courseName: schedule.course_name,
           dueDate: item.due_date,
           weightage: item.weightage,
+          openDate: item.open_date,
         });
       });
     });
@@ -203,6 +206,7 @@ const Index = () => {
               courseName={deadline.courseName}
               dueDate={deadline.dueDate}
               weightage={deadline.weightage}
+              openDate={deadline.openDate}
               index={index}
               highlighted={isWithinFiveDays(deadline.dueDate)}
             />

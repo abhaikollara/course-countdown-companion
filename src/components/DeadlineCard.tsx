@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, BookOpen, AlertTriangle, CheckCircle } from "lucide-react";
+import { Clock, BookOpen, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DeadlineCardProps {
@@ -7,6 +7,7 @@ interface DeadlineCardProps {
   courseName: string;
   dueDate: string;
   weightage: string;
+  openDate: string;
   index: number;
   highlighted?: boolean;
 }
@@ -42,7 +43,7 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, weightage, index, highlighted }: DeadlineCardProps) => {
+const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, index, highlighted }: DeadlineCardProps) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
 
   useEffect(() => {
@@ -114,10 +115,18 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, index, highlighted
             {item}
           </h3>
           
-          <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 shrink-0" />
-            {formatDate(dueDate)}
-          </p>
+          <div className="space-y-1">
+            {openDate && openDate.trim() !== "" && (
+              <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                Opens: {formatDate(openDate)}
+              </p>
+            )}
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              Due: {formatDate(dueDate)}
+            </p>
+          </div>
         </div>
 
         {urgency === "expired" ? (
