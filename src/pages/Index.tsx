@@ -128,18 +128,18 @@ const Index = () => {
       {/* Subtle gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
-      <div className="relative max-w-3xl mx-auto px-4 py-12">
+      <div className="relative max-w-3xl mx-auto px-4 py-6 sm:py-12">
         {/* Header */}
-        <header className="mb-10">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+        <header className="mb-6 sm:mb-10">
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1">
               B.Sc Computer Science
             </h1>
-            <p className="text-lg text-muted-foreground mb-2">
+            <p className="text-base sm:text-lg text-muted-foreground mb-2">
               BITS Pilani via Coursera
             </p>
             {scheduleData && (
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 Cohort {scheduleData.cohort} • Semester {scheduleData.semester} • Term {scheduleData.term}
               </p>
             )}
@@ -147,9 +147,9 @@ const Index = () => {
           <TooltipProvider delayDuration={250}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-lg cursor-help">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary/10 border border-primary/20 rounded-lg cursor-help">
                   <CalendarClock className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-xs sm:text-sm font-medium text-foreground">
                     {upcomingCount} upcoming {upcomingCount === 1 ? "deadline" : "deadlines"}
                   </span>
                 </div>
@@ -163,8 +163,8 @@ const Index = () => {
 
         {/* Course Filter */}
         {!loading && !error && courseNames.length > 0 && (
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2">
               {courseNames.map((courseName) => (
                 <div key={courseName} className="flex items-center space-x-2">
                   <Checkbox
