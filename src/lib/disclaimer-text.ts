@@ -1,0 +1,2 @@
+export const DISCLAIMER_TEXT = `This tool is for convenience only and may not always display the latest or correct assignment, quiz, or exam deadlines. All dates shown are based on publicly available/supplied course information and are not guaranteed to be accurate. Users are responsible for verifying all deadlines directly with the official course platform or instructor. The creators of this app assume no liability for missed deadlines, inaccuracies, or any consequences resulting from its use.`;
+

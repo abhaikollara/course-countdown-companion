@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DISCLAIMER_TEXT } from "@/lib/disclaimer-text";
 
 const SCHEDULE_URL = "/schedule.json";
 
@@ -44,6 +46,8 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [showPastDue, setShowPastDue] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [dontShowDisclaimer, setDontShowDisclaimer] = useState(false);
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -60,6 +64,12 @@ const Index = () => {
       } catch (e) {
         // If parsing fails, use default
       }
+    }
+
+    // Check if disclaimer should be shown
+    const disclaimerDismissed = localStorage.getItem("disclaimerDismissed");
+    if (disclaimerDismissed !== "true") {
+      setShowDisclaimer(true);
     }
   }, []);
 
@@ -202,8 +212,43 @@ const Index = () => {
 
   const upcomingCount = filteredDeadlinesWithPastDue.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
+  const handleDisclaimerClose = () => {
+    if (dontShowDisclaimer) {
+      localStorage.setItem("disclaimerDismissed", "true");
+    }
+    setShowDisclaimer(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Disclaimer Dialog */}
+      <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Disclaimer</DialogTitle>
+            <DialogDescription className="text-base text-foreground whitespace-pre-line pt-2">
+              {DISCLAIMER_TEXT}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2 py-4">
+            <Checkbox
+              id="dont-show-disclaimer"
+              checked={dontShowDisclaimer}
+              onCheckedChange={(checked) => setDontShowDisclaimer(checked === true)}
+            />
+            <Label
+              htmlFor="dont-show-disclaimer"
+              className="text-sm font-normal cursor-pointer text-foreground"
+            >
+              I understand, don't show this next time
+            </Label>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleDisclaimerClose}>I Understand</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Subtle gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
