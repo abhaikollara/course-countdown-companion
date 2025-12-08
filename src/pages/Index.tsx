@@ -69,7 +69,10 @@ const Index = () => {
     // Check if disclaimer should be shown
     const disclaimerDismissed = localStorage.getItem("disclaimerDismissed");
     if (disclaimerDismissed !== "true") {
-      setShowDisclaimer(true);
+      // Small delay to ensure component is fully mounted
+      setTimeout(() => {
+        setShowDisclaimer(true);
+      }, 100);
     }
   }, []);
 
@@ -222,8 +225,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Disclaimer Dialog */}
-      <Dialog open={showDisclaimer} onOpenChange={(open) => !open && handleDisclaimerClose()}>
-        <DialogContent className="max-w-2xl w-[calc(100%-2rem)] mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+      <Dialog open={showDisclaimer} onOpenChange={(open) => {
+        if (!open) {
+          handleDisclaimerClose();
+        }
+      }} modal={true}>
+        <DialogContent className="max-w-2xl w-[calc(100%-2rem)] sm:w-full mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto p-4 sm:p-6 z-[100]">
           <DialogHeader>
             <DialogTitle>Disclaimer</DialogTitle>
             <DialogDescription className="text-base text-foreground whitespace-pre-line pt-2">
