@@ -222,8 +222,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Disclaimer Dialog */}
-      <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
-        <DialogContent className="max-w-2xl">
+      <Dialog open={showDisclaimer} onOpenChange={(open) => !open && handleDisclaimerClose()}>
+        <DialogContent className="max-w-2xl w-[calc(100%-2rem)] mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Disclaimer</DialogTitle>
             <DialogDescription className="text-base text-foreground whitespace-pre-line pt-2">
@@ -244,7 +244,7 @@ const Index = () => {
             </Label>
           </div>
           <DialogFooter>
-            <Button onClick={handleDisclaimerClose}>I Understand</Button>
+            <Button onClick={handleDisclaimerClose} className="w-full sm:w-auto">I Understand</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
