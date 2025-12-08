@@ -45,8 +45,12 @@ const Index = () => {
       .then((res) => res.json())
       .then((data: ScheduleData) => {
         setScheduleData(data);
-        // Initialize with all courses selected
-        const allCourseNames = new Set(data.schedules.map((schedule) => schedule.course_name));
+        // Initialize with all courses selected except General Physics
+        const allCourseNames = new Set(
+          data.schedules
+            .map((schedule) => schedule.course_name)
+            .filter((name) => name !== "General Physics")
+        );
         setSelectedCourses(allCourseNames);
         setLoading(false);
       })
