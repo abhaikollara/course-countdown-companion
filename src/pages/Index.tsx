@@ -374,6 +374,13 @@ const Index = () => {
             </p>
           </div>
         )}
+
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-border">
+          <p className="text-center text-xs text-muted-foreground">
+            Made with ❤️ in God's own country
+          </p>
+        </footer>
       </div>
     </div>
   );
