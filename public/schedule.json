@@ -10,43 +10,43 @@
           "item": "Graded Quiz for Week 1 and 2",
           "due_date": "2025-12-17T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-13T18:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 3 and 4",
           "due_date": "2025-12-31T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-27T18:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 5 and 6",
           "due_date": "2026-01-14T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-10T18:00:00+05:30"
         },
         {
           "item": "Graded Lab Assignment: Modules 1-4",
           "due_date": "2026-01-21T03:24:00+05:30",
           "weightage": "10%",
-          "open_date": ""
+          "open_date": "2026-01-02T15:26:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 7 and 8",
           "due_date": "2026-01-27T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-24T18:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 9 and 10",
           "due_date": "2026-02-11T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-02-07T18:00:00+05:30"
         },
         {
           "item": "Graded Lab Assignment: Building Shell Scripts and Understanding System Calls",
           "due_date": "2026-02-14T03:25:00+05:30",
           "weightage": "10%",
-          "open_date": ""
+          "open_date": "2026-02-06T15:25:00+05:30"
         }
       ]
     },
@@ -57,43 +57,43 @@
           "item": "Graded Quiz for Week 1 and 2",
           "due_date": "2025-12-17T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-13T00:00:00+05:30"
         },
         {
           "item": "Auto graded assignment",
           "due_date": "2025-12-26T23:59:00+05:30",
           "weightage": "7%",
-          "open_date": ""
+          "open_date": "2025-12-20T00:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 3 and 4",
           "due_date": "2025-12-31T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-27T00:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 5 and 6",
           "due_date": "2026-01-14T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-10T00:00:00+05:30"
         },
         {
           "item": "Auto graded assignment",
           "due_date": "2026-01-23T23:59:00+05:30",
           "weightage": "13%",
-          "open_date": ""
+          "open_date": "2026-01-17T00:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 7 and 8",
           "due_date": "2026-01-27T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-24T00:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 9 and 10",
           "due_date": "2026-02-11T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-02-07T00:00:00+05:30"
         }
       ]
     },
@@ -104,43 +104,43 @@
           "item": "Graded Quiz for Week 1 and 2",
           "due_date": "2025-12-17T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-13T18:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 3 and 4",
           "due_date": "2025-12-31T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2025-12-27T18:00:00+05:30"
         },
         {
           "item": "Staff Graded Assessment",
           "due_date": "2026-01-09T04:24:00+05:30",
           "weightage": "10%",
-          "open_date": ""
+          "open_date": "2026-01-02T03:25:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 5 and 6",
           "due_date": "2026-01-14T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-10T18:00:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 7 and 8",
           "due_date": "2026-01-27T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-01-24T18:00:00+05:30"
         },
         {
           "item": "Staff Graded Assignment",
           "due_date": "2026-02-06T16:24:00+05:30",
           "weightage": "10%",
-          "open_date": ""
+          "open_date": "2026-01-30T03:25:00+05:30"
         },
         {
           "item": "Graded Quiz for Week 9 and 10",
           "due_date": "2026-02-11T23:59:00+05:30",
           "weightage": "6%",
-          "open_date": ""
+          "open_date": "2026-02-07T18:00:00+05:30"
         }
       ]
     },
