@@ -1,8 +1,10 @@
 import { useMemo, useEffect, useState } from "react";
 import { CalendarClock, GraduationCap, Loader2 } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
-const SCHEDULE_URL = "https://gist.githubusercontent.com/abhaikollara/ac11036abf3ef43738bb708744d0ff87/raw/5e0d97fdf8b21fbaf9b97b3e52bf8c0fa74196e3/cohort-5-s2-t2.json";
+const SCHEDULE_URL = "/schedule.json";
 
 interface ScheduleItem {
   item: string;
@@ -28,12 +30,16 @@ const Index = () => {
   const [scheduleData, setScheduleData] = useState<ScheduleData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch(SCHEDULE_URL)
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: ScheduleData) => {
         setScheduleData(data);
+        // Initialize with all courses selected
+        const allCourseNames = new Set(data.schedules.map((schedule) => schedule.course_name));
+        setSelectedCourses(allCourseNames);
         setLoading(false);
       })
       .catch((err) => {
@@ -41,6 +47,11 @@ const Index = () => {
         setLoading(false);
       });
   }, []);
+
+  const courseNames = useMemo(() => {
+    if (!scheduleData) return [];
+    return scheduleData.schedules.map((schedule) => schedule.course_name);
+  }, [scheduleData]);
 
   const sortedDeadlines = useMemo(() => {
     if (!scheduleData) return [];
@@ -62,6 +73,26 @@ const Index = () => {
     );
   }, [scheduleData]);
 
+  const filteredDeadlines = useMemo(() => {
+    return sortedDeadlines.filter((deadline) => selectedCourses.has(deadline.courseName));
+  }, [sortedDeadlines, selectedCourses]);
+
+  const toggleCourse = (courseName: string) => {
+    setSelectedCourses((prev) => {
+      const next = new Set(prev);
+      if (next.has(courseName)) {
+        // Prevent deselecting if it's the last selected course
+        if (next.size <= 1) {
+          return prev;
+        }
+        next.delete(courseName);
+      } else {
+        next.add(courseName);
+      }
+      return next;
+    });
+  };
+
   const fiveDaysFromNow = new Date().getTime() + 5 * 24 * 60 * 60 * 1000;
   const now = new Date().getTime();
   
@@ -70,7 +101,7 @@ const Index = () => {
     return time > now && time <= fiveDaysFromNow;
   };
 
-  const upcomingCount = sortedDeadlines.filter((d) => isWithinFiveDays(d.dueDate)).length;
+  const upcomingCount = filteredDeadlines.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,7 +116,7 @@ const Index = () => {
               <GraduationCap className="w-7 h-7 text-primary" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">
-              Deadline Tracker
+              Cohort 5 S2 T2 Deadline Tracker
             </h1>
           </div>
           <p className="text-muted-foreground flex items-center gap-2">
@@ -96,9 +127,32 @@ const Index = () => {
           </p>
         </header>
 
+        {/* Course Filter */}
+        {!loading && !error && courseNames.length > 0 && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {courseNames.map((courseName) => (
+                <div key={courseName} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={courseName}
+                    checked={selectedCourses.has(courseName)}
+                    onCheckedChange={() => toggleCourse(courseName)}
+                  />
+                  <Label
+                    htmlFor={courseName}
+                    className="text-xs font-normal cursor-pointer text-foreground"
+                  >
+                    {courseName}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Deadline Cards */}
         <div className="space-y-4">
-          {sortedDeadlines.map((deadline, index) => (
+          {filteredDeadlines.map((deadline, index) => (
             <DeadlineCard
               key={`${deadline.courseName}-${deadline.item}-${deadline.dueDate}`}
               item={deadline.item}
@@ -125,9 +179,11 @@ const Index = () => {
         )}
 
         {/* Empty state */}
-        {!loading && !error && sortedDeadlines.length === 0 && (
+        {!loading && !error && filteredDeadlines.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-muted-foreground">No deadlines found.</p>
+            <p className="text-muted-foreground">
+              No deadlines found for selected subjects.
+            </p>
           </div>
         )}
       </div>
