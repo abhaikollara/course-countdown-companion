@@ -45,18 +45,66 @@ const Index = () => {
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [showPastDue, setShowPastDue] = useState(false);
 
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedShowPastDue = localStorage.getItem("showPastDue");
+    if (savedShowPastDue !== null) {
+      setShowPastDue(savedShowPastDue === "true");
+    }
+
+    const savedSelectedCourses = localStorage.getItem("selectedCourses");
+    if (savedSelectedCourses) {
+      try {
+        const courses = JSON.parse(savedSelectedCourses) as string[];
+        setSelectedCourses(new Set(courses));
+      } catch (e) {
+        // If parsing fails, use default
+      }
+    }
+  }, []);
+
   useEffect(() => {
     fetch(SCHEDULE_URL)
       .then((res) => res.json())
       .then((data: ScheduleData) => {
         setScheduleData(data);
-        // Initialize with all courses selected except General Physics
-        const allCourseNames = new Set(
-          data.schedules
-            .map((schedule) => schedule.course_name)
-            .filter((name) => name !== "General Physics")
-        );
-        setSelectedCourses(allCourseNames);
+        // Initialize with saved courses or default (all except General Physics)
+        const savedSelectedCourses = localStorage.getItem("selectedCourses");
+        if (savedSelectedCourses) {
+          try {
+            const courses = JSON.parse(savedSelectedCourses) as string[];
+            const validCourses = courses.filter((name) =>
+              data.schedules.some((schedule) => schedule.course_name === name)
+            );
+            if (validCourses.length > 0) {
+              setSelectedCourses(new Set(validCourses));
+            } else {
+              // Fallback to default if saved courses are invalid
+              const allCourseNames = new Set(
+                data.schedules
+                  .map((schedule) => schedule.course_name)
+                  .filter((name) => name !== "General Physics")
+              );
+              setSelectedCourses(allCourseNames);
+            }
+          } catch (e) {
+            // If parsing fails, use default
+            const allCourseNames = new Set(
+              data.schedules
+                .map((schedule) => schedule.course_name)
+                .filter((name) => name !== "General Physics")
+            );
+            setSelectedCourses(allCourseNames);
+          }
+        } else {
+          // No saved courses, use default
+          const allCourseNames = new Set(
+            data.schedules
+              .map((schedule) => schedule.course_name)
+              .filter((name) => name !== "General Physics")
+          );
+          setSelectedCourses(allCourseNames);
+        }
         setLoading(false);
       })
       .catch((err) => {
@@ -64,6 +112,18 @@ const Index = () => {
         setLoading(false);
       });
   }, []);
+
+  // Save selectedCourses to localStorage whenever it changes
+  useEffect(() => {
+    if (selectedCourses.size > 0) {
+      localStorage.setItem("selectedCourses", JSON.stringify(Array.from(selectedCourses)));
+    }
+  }, [selectedCourses]);
+
+  // Save showPastDue to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("showPastDue", String(showPastDue));
+  }, [showPastDue]);
 
   const courseNames = useMemo(() => {
     if (!scheduleData) return [];
