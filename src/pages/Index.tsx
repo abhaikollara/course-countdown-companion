@@ -131,20 +131,21 @@ const Index = () => {
       <div className="relative max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <header className="mb-10">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-primary/10 glow-primary">
-              <GraduationCap className="w-7 h-7 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground">
-                Quizzes and Assignments
-              </h1>
-              {scheduleData && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Cohort {scheduleData.cohort} • Semester {scheduleData.semester} • Term {scheduleData.term}
-                </p>
-              )}
-            </div>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-1">
+              B.Sc Computer Science
+            </h1>
+            <p className="text-lg text-muted-foreground mb-2">
+              BITS Pilani via Coursera
+            </p>
+            <p className="text-xl font-semibold text-foreground">
+              Quizzes and assignments deadlines
+            </p>
+            {scheduleData && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Cohort {scheduleData.cohort} • Semester {scheduleData.semester} • Term {scheduleData.term}
+              </p>
+            )}
           </div>
           <TooltipProvider delayDuration={250}>
             <Tooltip>
