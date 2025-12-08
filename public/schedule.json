@@ -143,6 +143,53 @@
           "open_date": ""
         }
       ]
+    },
+    {
+      "course_name": "General Physics",
+      "items": [
+        {
+          "item": "Quiz Week 1 & 2",
+          "due_date": "2025-12-17T23:59:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Quiz Week 3 & 4",
+          "due_date": "2025-12-31T23:59:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Graded Assignment 1",
+          "due_date": "2026-01-08T03:24:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Quiz Week 5 & 6",
+          "due_date": "2026-01-14T23:59:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Quiz Week 7 & 8",
+          "due_date": "2026-01-27T23:59:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Quiz Week 9 & 10",
+          "due_date": "2026-02-11T01:54:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        },
+        {
+          "item": "Graded Assignment 2",
+          "due_date": "2026-02-21T03:24:00+05:30",
+          "weightage": "",
+          "open_date": ""
+        }
+      ]
     }
   ]
 }
