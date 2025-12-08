@@ -132,12 +132,12 @@ const Index = () => {
               )}
             </div>
           </div>
-          <p className="text-muted-foreground flex items-center gap-2">
-            <CalendarClock className="w-4 h-4" />
-            <span>
+          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-lg">
+            <CalendarClock className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">
               {upcomingCount} upcoming {upcomingCount === 1 ? "deadline" : "deadlines"} in the next 5 days
             </span>
-          </p>
+          </div>
         </header>
 
         {/* Course Filter */}
