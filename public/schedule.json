@@ -5,6 +5,7 @@
   "schedules": [
     {
       "course_name": "Command Line Interfaces & Scripting",
+      "course_name_short": "CLI",
       "items": [
         {
           "item": "Graded Quiz for Week 1 and 2",
@@ -52,6 +53,7 @@
     },
     {
       "course_name": "Data Structures and Algorithms",
+      "course_name_short": "DSA",
       "items": [
         {
           "item": "Graded Quiz for Week 1 and 2",
@@ -99,6 +101,7 @@
     },
     {
       "course_name": "General Biology",
+      "course_name_short": "BIO",
       "items": [
         {
           "item": "Graded Quiz for Week 1 and 2",
@@ -146,6 +149,7 @@
     },
     {
       "course_name": "General Physics",
+      "course_name_short": "PHY",
       "items": [
         {
           "item": "Quiz Week 1 & 2",

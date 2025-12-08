@@ -19,6 +19,7 @@ interface ScheduleItem {
 
 interface Schedule {
   course_name: string;
+  course_name_short: string;
   items: ScheduleItem[];
 }
 
@@ -67,6 +68,15 @@ const Index = () => {
   const courseNames = useMemo(() => {
     if (!scheduleData) return [];
     return scheduleData.schedules.map((schedule) => schedule.course_name);
+  }, [scheduleData]);
+
+  const courseNameMap = useMemo(() => {
+    if (!scheduleData) return new Map<string, string>();
+    const map = new Map<string, string>();
+    scheduleData.schedules.forEach((schedule) => {
+      map.set(schedule.course_name, schedule.course_name_short);
+    });
+    return map;
   }, [scheduleData]);
 
   const sortedDeadlines = useMemo(() => {
@@ -169,7 +179,13 @@ const Index = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full sm:w-auto justify-between text-xs h-9">
-                  <span>Select courses</span>
+                  <span>
+                    {selectedCourses.size === 0
+                      ? "Select courses"
+                      : Array.from(selectedCourses)
+                          .map((name) => courseNameMap.get(name) || name)
+                          .join(", ")}
+                  </span>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
