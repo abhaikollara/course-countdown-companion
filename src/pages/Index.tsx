@@ -123,7 +123,7 @@ const Index = () => {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-foreground">
-                Deadline Tracker
+                Quizzes and Assignments
               </h1>
               {scheduleData && (
                 <p className="text-sm text-muted-foreground mt-1">
