@@ -8,6 +8,7 @@ interface DeadlineCardProps {
   dueDate: string;
   weightage: string;
   openDate: string;
+  url?: string;
   index: number;
   highlighted?: boolean;
 }
@@ -43,7 +44,7 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, index, highlighted }: DeadlineCardProps) => {
+const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, index, highlighted }: DeadlineCardProps) => {
   // Calculate time left for both open and due dates
   const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() => 
     openDate && openDate.trim() !== "" ? calculateTimeLeft(openDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
@@ -131,14 +132,30 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, index, h
     return `${timeLeft.seconds} second${timeLeft.seconds !== 1 ? "s" : ""}`;
   };
 
+  const handleClick = () => {
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <div
       className={cn(
         "glass-card rounded-lg p-4 sm:p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg animate-fade-in",
         urgencyStyles[urgency],
-        highlighted && "ring-2 ring-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+        highlighted && "ring-2 ring-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.3)]",
+        url && "cursor-pointer"
       )}
       style={{ animationDelay: `${index * 100}ms` }}
+      onClick={handleClick}
+      role={url ? "button" : undefined}
+      tabIndex={url ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (url && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div className="flex-1 min-w-0">
