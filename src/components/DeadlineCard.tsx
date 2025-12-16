@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, BookOpen, AlertTriangle, CheckCircle, Calendar, CheckSquare, Square } from "lucide-react";
+import { Clock, BookOpen, AlertTriangle, CheckCircle, Calendar, CheckSquare, Square, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -191,7 +191,7 @@ const DeadlineCard = ({
             <span
               className={cn(
                 "text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 transition-colors",
-                onSubjectClick && "cursor-pointer hover:text-primary hover:underline"
+                onSubjectClick && "cursor-pointer hover:text-primary hover:underline group/subject"
               )}
               onClick={(e) => {
                 if (onSubjectClick) {
@@ -202,6 +202,9 @@ const DeadlineCard = ({
             >
               <BookOpen className="w-3.5 h-3.5" />
               {courseName}
+              {onSubjectClick && (
+                <Info className="w-3 h-3 opacity-0 -ml-0.5 group-hover/subject:opacity-100 transition-opacity" />
+              )}
             </span>
             <span className={cn(
               "text-xs font-semibold px-2 py-0.5 rounded",

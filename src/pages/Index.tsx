@@ -408,7 +408,7 @@ const Index = () => {
 
       {/* Score Prompt Dialog */}
       <Dialog open={scoreDialogOpen} onOpenChange={(open) => !open && handleScoreCancel()}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-[90vw] sm:max-w-sm rounded-lg">
           <DialogHeader>
             <DialogTitle>Mark as Done</DialogTitle>
             <DialogDescription>
@@ -416,8 +416,8 @@ const Index = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <div className="flex items-center gap-4">
-              <Label htmlFor="score-input" className="text-right">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <Label htmlFor="score-input" className="text-left sm:text-right shrink-0">
                 Score (%)
               </Label>
               <input
@@ -427,7 +427,7 @@ const Index = () => {
                 max="100"
                 value={tempScore}
                 onChange={(e) => setTempScore(e.target.value)}
-                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="e.g. 95"
                 autoFocus
                 onKeyDown={(e) => {
@@ -438,8 +438,8 @@ const Index = () => {
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleScoreCancel}>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={handleScoreCancel} className="mt-2 sm:mt-0">
               Cancel
             </Button>
             <Button onClick={handleScoreSubmit}>
@@ -475,9 +475,9 @@ const Index = () => {
                   <thead className="bg-muted/50">
                     <tr className="border-b">
                       <th className="h-10 px-4 text-left font-medium text-muted-foreground">Task</th>
-                      <th className="h-10 px-4 text-left font-medium text-muted-foreground">Due Date</th>
-                      <th className="h-10 px-4 text-right font-medium text-muted-foreground">Weightage</th>
-                      <th className="h-10 px-4 text-center font-medium text-muted-foreground">Status</th>
+                      <th className="h-10 px-4 text-left font-medium text-muted-foreground hidden sm:table-cell">Due Date</th>
+                      <th className="h-10 px-4 text-right font-medium text-muted-foreground hidden sm:table-cell">Weightage</th>
+                      <th className="h-10 px-4 text-center font-medium text-muted-foreground hidden sm:table-cell">Status</th>
                       <th className="h-10 px-4 text-right font-medium text-muted-foreground">Score</th>
                     </tr>
                   </thead>
@@ -494,13 +494,13 @@ const Index = () => {
                             <td className={cn("p-4 font-medium", isCompleted && "text-muted-foreground line-through")}>
                               {deadline.item}
                             </td>
-                            <td className="p-4 text-muted-foreground">
+                            <td className="p-4 text-muted-foreground hidden sm:table-cell">
                               {new Date(deadline.dueDate).toLocaleDateString()}
                             </td>
-                            <td className="p-4 text-right font-mono">
+                            <td className="p-4 text-right font-mono hidden sm:table-cell">
                               {deadline.weightage}
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-4 text-center hidden sm:table-cell">
                               {isCompleted ? (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600">
                                   Done
