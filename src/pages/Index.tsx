@@ -57,6 +57,11 @@ const Index = () => {
   const [scores, setScores] = useState<Record<string, number>>({});
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
+  // Score Dialog State
+  const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
+  const [pendingScoreId, setPendingScoreId] = useState<string | null>(null);
+  const [tempScore, setTempScore] = useState<string>("");
+
   const handleSubjectClick = (courseName: string) => {
     setSelectedSubject(courseName);
   };
@@ -252,15 +257,48 @@ const Index = () => {
   };
 
   const toggleCompleted = (id: string) => {
-    setCompletedItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
+    if (completedItems.has(id)) {
+      // If already completed, just unmark it
+      setCompletedItems((prev) => {
+        const next = new Set(prev);
         next.delete(id);
-      } else {
-        next.add(id);
+        return next;
+      });
+    } else {
+      // If not completed, open dialog to ask for score
+      setPendingScoreId(id);
+      setTempScore("");
+      setScoreDialogOpen(true);
+    }
+  };
+
+  const handleScoreSubmit = () => {
+    if (pendingScoreId) {
+      // Save score if provided
+      if (tempScore !== "") {
+        const scoreVal = parseFloat(tempScore);
+        if (!isNaN(scoreVal) && scoreVal >= 0 && scoreVal <= 100) {
+          setScores((prev) => ({
+            ...prev,
+            [pendingScoreId]: scoreVal,
+          }));
+        }
       }
-      return next;
-    });
+
+      // Mark as completed
+      setCompletedItems((prev) => {
+        const next = new Set(prev);
+        next.add(pendingScoreId);
+        return next;
+      });
+    }
+    setScoreDialogOpen(false);
+    setPendingScoreId(null);
+  };
+
+  const handleScoreCancel = () => {
+    setScoreDialogOpen(false);
+    setPendingScoreId(null);
   };
 
   const handleScoreChange = (id: string, score: number) => {
@@ -366,36 +404,56 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Disclaimer Dialog */}
-      <Dialog open={showDisclaimer} onOpenChange={(open) => {
-        if (!open) {
-          handleDisclaimerClose();
-        }
-      }} modal={true}>
-        <DialogContent className="max-w-2xl w-[calc(100%-2rem)] sm:w-full mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto p-4 sm:p-6 z-[100]">
+      {/* ... existing disclaimer dialog ... */}
+
+      {/* Score Prompt Dialog */}
+      <Dialog open={scoreDialogOpen} onOpenChange={(open) => !open && handleScoreCancel()}>
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Disclaimer</DialogTitle>
-            <DialogDescription className="text-base text-foreground whitespace-pre-line pt-2">
-              {DISCLAIMER_TEXT}
+            <DialogTitle>Mark as Done</DialogTitle>
+            <DialogDescription>
+              Enter your score for this task (optional).
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center space-x-2 py-4">
-            <Checkbox
-              id="dont-show-disclaimer"
-              checked={dontShowDisclaimer}
-              onCheckedChange={(checked) => setDontShowDisclaimer(checked === true)}
-            />
-            <Label
-              htmlFor="dont-show-disclaimer"
-              className="text-sm font-normal cursor-pointer text-foreground"
-            >
-              I understand, don't show this next time
-            </Label>
+          <div className="py-4">
+            <div className="flex items-center gap-4">
+              <Label htmlFor="score-input" className="text-right">
+                Score (%)
+              </Label>
+              <input
+                id="score-input"
+                type="number"
+                min="0"
+                max="100"
+                value={tempScore}
+                onChange={(e) => setTempScore(e.target.value)}
+                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="e.g. 95"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleScoreSubmit();
+                  }
+                }}
+              />
+            </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleDisclaimerClose} className="w-full sm:w-auto">I Understand</Button>
+            <Button variant="outline" onClick={handleScoreCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleScoreSubmit}>
+              Mark as Done
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Grade Sheet Modal */}
+      {/* ... existing grade sheet modal ... */}
+
+      {/* ... existing content ... */}
+
 
       {/* Grade Sheet Modal */}
       <Dialog open={selectedSubject !== null} onOpenChange={(open) => !open && setSelectedSubject(null)}>
