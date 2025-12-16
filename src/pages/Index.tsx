@@ -53,6 +53,7 @@ const Index = () => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [dontShowDisclaimer, setDontShowDisclaimer] = useState(false);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
+  const [scores, setScores] = useState<Record<string, number>>({});
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -79,8 +80,22 @@ const Index = () => {
     const savedCompletedItems = localStorage.getItem("completedItems");
     if (savedCompletedItems) {
       try {
-        const items = JSON.parse(savedCompletedItems) as string[];
-        setCompletedItems(new Set(items));
+        const items = JSON.parse(savedCompletedItems);
+        if (Array.isArray(items)) {
+          setCompletedItems(new Set(items));
+        }
+      } catch (e) {
+        // If parsing fails, ignore
+      }
+    }
+
+    const savedScores = localStorage.getItem("scores");
+    if (savedScores) {
+      try {
+        const parsedScores = JSON.parse(savedScores);
+        if (parsedScores && typeof parsedScores === 'object') {
+          setScores(parsedScores as Record<string, number>);
+        }
       } catch (e) {
         // If parsing fails, ignore
       }
@@ -168,6 +183,11 @@ const Index = () => {
     localStorage.setItem("completedItems", JSON.stringify(Array.from(completedItems)));
   }, [completedItems]);
 
+  // Save scores to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("scores", JSON.stringify(scores));
+  }, [scores]);
+
   const courseNames = useMemo(() => {
     if (!scheduleData) return [];
     return scheduleData.schedules.map((schedule) => schedule.course_name);
@@ -237,6 +257,13 @@ const Index = () => {
     });
   };
 
+  const handleScoreChange = (id: string, score: number) => {
+    setScores((prev) => ({
+      ...prev,
+      [id]: score,
+    }));
+  };
+
   const fiveDaysFromNow = new Date().getTime() + 5 * 24 * 60 * 60 * 1000;
   const now = new Date().getTime();
 
@@ -272,19 +299,30 @@ const Index = () => {
   const stats = useMemo(() => {
     if (!scheduleData) return { overall: { total: 0, completed: 0, percentage: 0 }, courses: new Map() };
 
-    const courses = new Map<string, { total: number; completed: number; percentage: number }>();
+    const courses = new Map<string, { total: number; completed: number; percentage: number; grade: number }>();
     let overallTotal = 0;
     let overallCompleted = 0;
 
     scheduleData.schedules.forEach((schedule) => {
       let courseTotal = 0;
       let courseCompleted = 0;
+      let courseWeightedScore = 0;
 
       schedule.items.forEach((item) => {
         courseTotal++;
         const id = `${schedule.course_name}-${item.item}-${item.due_date}`;
         if (completedItems.has(id)) {
           courseCompleted++;
+
+          // Calculate weighted score
+          const score = scores[id];
+          if (score !== undefined) {
+            const weightageStr = item.weightage.replace('%', '');
+            const weightage = parseFloat(weightageStr);
+            if (!isNaN(weightage)) {
+              courseWeightedScore += (score / 100) * weightage;
+            }
+          }
         }
       });
 
@@ -298,6 +336,7 @@ const Index = () => {
         total: courseTotal,
         completed: courseCompleted,
         percentage: courseTotal > 0 ? Math.round((courseCompleted / courseTotal) * 100) : 0,
+        grade: parseFloat(courseWeightedScore.toFixed(2)),
       });
     });
 
@@ -309,7 +348,7 @@ const Index = () => {
       },
       courses,
     };
-  }, [scheduleData, completedItems, selectedCourses]);
+  }, [scheduleData, completedItems, selectedCourses, scores]);
 
   const handleDisclaimerClose = () => {
     if (dontShowDisclaimer) {
@@ -417,12 +456,19 @@ const Index = () => {
                             onCheckedChange={() => toggleCourse(courseName)}
                           />
                           <div className="flex-1 min-w-0">
-                            <Label
-                              htmlFor={courseName}
-                              className="text-sm font-normal cursor-pointer text-foreground block truncate"
-                            >
-                              {courseName}
-                            </Label>
+                            <div className="flex justify-between items-center">
+                              <Label
+                                htmlFor={courseName}
+                                className="text-sm font-normal cursor-pointer text-foreground block truncate"
+                              >
+                                {courseName}
+                              </Label>
+                              {courseStat && (
+                                <span className="text-[10px] font-medium text-primary">
+                                  Grade: {courseStat.grade}%
+                                </span>
+                              )}
+                            </div>
                             {courseStat && (
                               <div className="flex items-center gap-2 mt-0.5">
                                 <Progress value={courseStat.percentage} className="h-1 flex-1" />
@@ -487,6 +533,8 @@ const Index = () => {
                 highlighted={isWithinFiveDays(deadline.dueDate)}
                 isCompleted={completedItems.has(id)}
                 onToggleCompleted={() => toggleCompleted(id)}
+                score={scores[id]}
+                onScoreChange={(score) => handleScoreChange(id, score)}
               />
             );
           })}

@@ -14,6 +14,8 @@ interface DeadlineCardProps {
   highlighted?: boolean;
   isCompleted?: boolean;
   onToggleCompleted?: () => void;
+  score?: number;
+  onScoreChange?: (score: number) => void;
 }
 
 interface TimeLeft {
@@ -57,7 +59,9 @@ const DeadlineCard = ({
   index,
   highlighted,
   isCompleted,
-  onToggleCompleted
+  onToggleCompleted,
+  score,
+  onScoreChange,
 }: DeadlineCardProps) => {
   // Calculate time left for both open and due dates
   const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() =>
@@ -89,7 +93,8 @@ const DeadlineCard = ({
   const urgency = getUrgencyLevel(dueTimeLeft);
 
   // Parse weightage and check if it's high (>= 10%)
-  const weightageValue = parseFloat(weightage.replace('%', ''));
+  const safeWeightage = weightage || "0%";
+  const weightageValue = parseFloat(safeWeightage.replace('%', ''));
   const isHighWeightage = weightageValue >= 10;
 
   // Check if item is currently open (after open_date and before due_date)
@@ -147,8 +152,8 @@ const DeadlineCard = ({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // Don't trigger card click if clicking on the checkbox/button
-    if ((e.target as HTMLElement).closest('button')) {
+    // Don't trigger card click if clicking on the checkbox/button or input
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('input')) {
       return;
     }
 
@@ -182,7 +187,7 @@ const DeadlineCard = ({
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className={cn("w-2 h-2 rounded-full shrink-0", urgencyIndicator[urgency])} />
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-              <BookOpen className="w-3 h-3" />
+              <BookOpen className="w-3.5 h-3.5" />
               {courseName}
             </span>
             <span className={cn(
@@ -214,6 +219,31 @@ const DeadlineCard = ({
               Due: {formatDate(dueDate)}
             </p>
           </div>
+
+          {/* Score Input */}
+          {isCompleted && onScoreChange && (
+            <div className="mt-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+              <label htmlFor={`score-${index}`} className="text-xs font-medium text-muted-foreground">
+                Score (%):
+              </label>
+              <input
+                id={`score-${index}`}
+                type="number"
+                min="0"
+                max="100"
+                value={score ?? ""}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (!isNaN(val) && val >= 0 && val <= 100) {
+                    onScoreChange(val);
+                  }
+                }}
+                className="w-16 h-7 px-2 text-xs rounded border border-input bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                placeholder="-"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 shrink-0 items-end justify-between h-full">
