@@ -282,13 +282,17 @@ const Index = () => {
 
       schedule.items.forEach((item) => {
         courseTotal++;
-        overallTotal++;
         const id = `${schedule.course_name}-${item.item}-${item.due_date}`;
         if (completedItems.has(id)) {
           courseCompleted++;
-          overallCompleted++;
         }
       });
+
+      // Only add to overall stats if the course is selected
+      if (selectedCourses.has(schedule.course_name)) {
+        overallTotal += courseTotal;
+        overallCompleted += courseCompleted;
+      }
 
       courses.set(schedule.course_name, {
         total: courseTotal,
@@ -305,7 +309,7 @@ const Index = () => {
       },
       courses,
     };
-  }, [scheduleData, completedItems]);
+  }, [scheduleData, completedItems, selectedCourses]);
 
   const handleDisclaimerClose = () => {
     if (dontShowDisclaimer) {
