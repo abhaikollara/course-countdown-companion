@@ -48,14 +48,21 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [showPastDue, setShowPastDue] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [dontShowDisclaimer, setDontShowDisclaimer] = useState(false);
+  const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
 
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedShowPastDue = localStorage.getItem("showPastDue");
     if (savedShowPastDue !== null) {
       setShowPastDue(savedShowPastDue === "true");
+    }
+
+    const savedShowCompleted = localStorage.getItem("showCompleted");
+    if (savedShowCompleted !== null) {
+      setShowCompleted(savedShowCompleted === "true");
     }
 
     const savedSelectedCourses = localStorage.getItem("selectedCourses");
@@ -65,6 +72,16 @@ const Index = () => {
         setSelectedCourses(new Set(courses));
       } catch (e) {
         // If parsing fails, use default
+      }
+    }
+
+    const savedCompletedItems = localStorage.getItem("completedItems");
+    if (savedCompletedItems) {
+      try {
+        const items = JSON.parse(savedCompletedItems) as string[];
+        setCompletedItems(new Set(items));
+      } catch (e) {
+        // If parsing fails, ignore
       }
     }
 
@@ -140,6 +157,16 @@ const Index = () => {
     localStorage.setItem("showPastDue", String(showPastDue));
   }, [showPastDue]);
 
+  // Save showCompleted to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("showCompleted", String(showCompleted));
+  }, [showCompleted]);
+
+  // Save completedItems to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("completedItems", JSON.stringify(Array.from(completedItems)));
+  }, [completedItems]);
+
   const courseNames = useMemo(() => {
     if (!scheduleData) return [];
     return scheduleData.schedules.map((schedule) => schedule.course_name);
@@ -156,7 +183,7 @@ const Index = () => {
 
   const sortedDeadlines = useMemo(() => {
     if (!scheduleData) return [];
-    
+
     const allItems: DeadlineItem[] = [];
 
     scheduleData.schedules.forEach((schedule) => {
@@ -197,9 +224,21 @@ const Index = () => {
     });
   };
 
+  const toggleCompleted = (id: string) => {
+    setCompletedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   const fiveDaysFromNow = new Date().getTime() + 5 * 24 * 60 * 60 * 1000;
   const now = new Date().getTime();
-  
+
   const isWithinFiveDays = (dueDate: string) => {
     const time = new Date(dueDate).getTime();
     return time > now && time <= fiveDaysFromNow;
@@ -210,11 +249,21 @@ const Index = () => {
   };
 
   const filteredDeadlinesWithPastDue = useMemo(() => {
-    if (showPastDue) {
-      return filteredDeadlines;
+    let result = filteredDeadlines;
+
+    if (!showPastDue) {
+      result = result.filter((deadline) => !isPastDue(deadline.dueDate));
     }
-    return filteredDeadlines.filter((deadline) => !isPastDue(deadline.dueDate));
-  }, [filteredDeadlines, showPastDue]);
+
+    if (!showCompleted) {
+      result = result.filter((deadline) => {
+        const id = `${deadline.courseName}-${deadline.item}-${deadline.dueDate}`;
+        return !completedItems.has(id);
+      });
+    }
+
+    return result;
+  }, [filteredDeadlines, showPastDue, showCompleted, completedItems]);
 
   const upcomingCount = filteredDeadlinesWithPastDue.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
@@ -261,7 +310,7 @@ const Index = () => {
 
       {/* Subtle gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-      
+
       <div className="relative max-w-3xl mx-auto px-4 py-6 sm:py-12">
         {/* Header */}
         <header className="mb-6 sm:mb-10">
@@ -278,7 +327,7 @@ const Index = () => {
               </p>
             )}
           </div>
-          </header>
+        </header>
 
         {/* Course Filter */}
         {!loading && !error && courseNames.length > 0 && (
@@ -290,8 +339,8 @@ const Index = () => {
                     {selectedCourses.size === 0
                       ? "Select courses"
                       : Array.from(selectedCourses)
-                          .map((name) => courseNameMap.get(name) || name)
-                          .join(", ")}
+                        .map((name) => courseNameMap.get(name) || name)
+                        .join(", ")}
                   </span>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
@@ -322,6 +371,19 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Label
+                  htmlFor="show-completed"
+                  className="text-xs font-medium cursor-pointer text-foreground whitespace-nowrap"
+                >
+                  Show completed
+                </Label>
+                <Switch
+                  id="show-completed"
+                  checked={showCompleted}
+                  onCheckedChange={setShowCompleted}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Label
                   htmlFor="show-past-due"
                   className="text-xs font-medium cursor-pointer text-foreground whitespace-nowrap"
                 >
@@ -339,19 +401,24 @@ const Index = () => {
 
         {/* Deadline Cards */}
         <div className="space-y-4">
-          {filteredDeadlinesWithPastDue.map((deadline, index) => (
-            <DeadlineCard
-              key={`${deadline.courseName}-${deadline.item}-${deadline.dueDate}`}
-              item={deadline.item}
-              courseName={deadline.courseName}
-              dueDate={deadline.dueDate}
-              weightage={deadline.weightage}
-              openDate={deadline.openDate}
-              url={deadline.url}
-              index={index}
-              highlighted={isWithinFiveDays(deadline.dueDate)}
-            />
-          ))}
+          {filteredDeadlinesWithPastDue.map((deadline, index) => {
+            const id = `${deadline.courseName}-${deadline.item}-${deadline.dueDate}`;
+            return (
+              <DeadlineCard
+                key={id}
+                item={deadline.item}
+                courseName={deadline.courseName}
+                dueDate={deadline.dueDate}
+                weightage={deadline.weightage}
+                openDate={deadline.openDate}
+                url={deadline.url}
+                index={index}
+                highlighted={isWithinFiveDays(deadline.dueDate)}
+                isCompleted={completedItems.has(id)}
+                onToggleCompleted={() => toggleCompleted(id)}
+              />
+            );
+          })}
         </div>
 
         {/* Loading state */}
@@ -372,8 +439,8 @@ const Index = () => {
         {!loading && !error && filteredDeadlinesWithPastDue.length === 0 && (
           <div className="text-center py-20">
             <p className="text-muted-foreground">
-              {showPastDue 
-                ? "No deadlines found for selected subjects." 
+              {showPastDue
+                ? "No deadlines found for selected subjects."
                 : "No upcoming deadlines found. Try enabling 'Show past due' to see past deadlines."}
             </p>
           </div>

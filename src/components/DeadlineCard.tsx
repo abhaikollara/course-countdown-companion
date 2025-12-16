@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Clock, BookOpen, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
+import { Clock, BookOpen, AlertTriangle, CheckCircle, Calendar, CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface DeadlineCardProps {
   item: string;
@@ -11,6 +12,8 @@ interface DeadlineCardProps {
   url?: string;
   index: number;
   highlighted?: boolean;
+  isCompleted?: boolean;
+  onToggleCompleted?: () => void;
 }
 
 interface TimeLeft {
@@ -23,7 +26,7 @@ interface TimeLeft {
 
 const calculateTimeLeft = (dueDate: string): TimeLeft => {
   const difference = new Date(dueDate).getTime() - new Date().getTime();
-  
+
   if (difference <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
   }
@@ -44,9 +47,20 @@ const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" 
   return "normal";
 };
 
-const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, index, highlighted }: DeadlineCardProps) => {
+const DeadlineCard = ({
+  item,
+  courseName,
+  dueDate,
+  weightage,
+  openDate,
+  url,
+  index,
+  highlighted,
+  isCompleted,
+  onToggleCompleted
+}: DeadlineCardProps) => {
   // Calculate time left for both open and due dates
-  const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() => 
+  const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() =>
     openDate && openDate.trim() !== "" ? calculateTimeLeft(openDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
   );
   const [dueTimeLeft, setDueTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
@@ -73,15 +87,15 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
 
   // Calculate urgency based on due date
   const urgency = getUrgencyLevel(dueTimeLeft);
-  
+
   // Parse weightage and check if it's high (>= 10%)
   const weightageValue = parseFloat(weightage.replace('%', ''));
   const isHighWeightage = weightageValue >= 10;
 
   // Check if item is currently open (after open_date and before due_date)
   const now = new Date().getTime();
-  const isOpenNow = openDate && openDate.trim() !== "" && 
-    new Date(openDate).getTime() <= now && 
+  const isOpenNow = openDate && openDate.trim() !== "" &&
+    new Date(openDate).getTime() <= now &&
     new Date(dueDate).getTime() > now;
 
   const urgencyStyles = {
@@ -110,29 +124,34 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
 
   const formatTimeRemaining = (timeLeft: TimeLeft): string => {
     if (timeLeft.total <= 0) return "Past due";
-    
+
     if (timeLeft.days > 0) {
       if (timeLeft.hours > 0) {
         return `${timeLeft.days} day${timeLeft.days !== 1 ? "s" : ""}, ${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}`;
       }
       return `${timeLeft.days} day${timeLeft.days !== 1 ? "s" : ""}`;
     }
-    
+
     if (timeLeft.hours > 0) {
       if (timeLeft.minutes > 0) {
         return `${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}, ${timeLeft.minutes} min${timeLeft.minutes !== 1 ? "s" : ""}`;
       }
       return `${timeLeft.hours} hour${timeLeft.hours !== 1 ? "s" : ""}`;
     }
-    
+
     if (timeLeft.minutes > 0) {
       return `${timeLeft.minutes} minute${timeLeft.minutes !== 1 ? "s" : ""}`;
     }
-    
+
     return `${timeLeft.seconds} second${timeLeft.seconds !== 1 ? "s" : ""}`;
   };
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Don't trigger card click if clicking on the checkbox/button
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+
     if (url) {
       window.open(url, "_blank", "noopener,noreferrer");
     }
@@ -141,10 +160,11 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
   return (
     <div
       className={cn(
-        "glass-card rounded-lg p-4 sm:p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg animate-fade-in",
+        "glass-card rounded-lg p-4 sm:p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg animate-fade-in group relative",
         urgencyStyles[urgency],
-        highlighted && "ring-2 ring-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.3)]",
-        url && "cursor-pointer"
+        highlighted && !isCompleted && "ring-2 ring-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.3)]",
+        url && "cursor-pointer",
+        isCompleted && "opacity-60 grayscale"
       )}
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={handleClick}
@@ -153,7 +173,7 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
       onKeyDown={(e) => {
         if (url && (e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
-          handleClick();
+          handleClick(e as any);
         }
       }}
     >
@@ -167,18 +187,21 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
             </span>
             <span className={cn(
               "text-xs font-semibold px-2 py-0.5 rounded",
-              isHighWeightage 
-                ? "text-amber-600 bg-amber-500/20 border border-amber-500/30" 
+              isHighWeightage
+                ? "text-amber-600 bg-amber-500/20 border border-amber-500/30"
                 : "text-primary bg-primary/10"
             )}>
               {weightage}
             </span>
           </div>
-          
-          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1 break-words">
+
+          <h3 className={cn(
+            "text-base sm:text-lg font-semibold text-foreground mb-1 break-words transition-all",
+            isCompleted && "line-through text-muted-foreground"
+          )}>
             {item}
           </h3>
-          
+
           <div className="space-y-1">
             {openDate && openDate.trim() !== "" && (
               <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
@@ -193,45 +216,69 @@ const DeadlineCard = ({ item, courseName, dueDate, weightage, openDate, url, ind
           </div>
         </div>
 
-        {urgency === "expired" ? (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <CheckCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">Past Due</span>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3 shrink-0 items-end">
-            {openDate && openDate.trim() !== "" && (
+        <div className="flex flex-col gap-3 shrink-0 items-end justify-between h-full">
+          {onToggleCompleted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary transition-colors",
+                isCompleted ? "text-primary" : "text-muted-foreground"
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleCompleted();
+              }}
+              title={isCompleted ? "Mark as incomplete" : "Mark as done"}
+            >
+              {isCompleted ? (
+                <CheckSquare className="w-5 h-5" />
+              ) : (
+                <Square className="w-5 h-5" />
+              )}
+            </Button>
+          )}
+
+          {urgency === "expired" ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CheckCircle className="w-5 h-5" />
+              <span className="text-sm font-medium">Past Due</span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 items-end">
+              {openDate && openDate.trim() !== "" && (
+                <div className="flex flex-col items-end">
+                  {isOpenNow ? (
+                    <>
+                      <span className="text-xs text-muted-foreground mb-1">Status:</span>
+                      <span className="text-sm font-semibold text-green-600">
+                        Open now
+                      </span>
+                    </>
+                  ) : openTimeLeft.total > 0 ? (
+                    <>
+                      <span className="text-xs text-muted-foreground mb-1">Opens in:</span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {formatTimeRemaining(openTimeLeft)}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              )}
               <div className="flex flex-col items-end">
-                {isOpenNow ? (
-                  <>
-                    <span className="text-xs text-muted-foreground mb-1">Status:</span>
-                    <span className="text-sm font-semibold text-green-600">
-                      Open now
-                    </span>
-                  </>
-                ) : openTimeLeft.total > 0 ? (
-                  <>
-                    <span className="text-xs text-muted-foreground mb-1">Opens in:</span>
-                    <span className="text-sm font-semibold text-foreground">
-                      {formatTimeRemaining(openTimeLeft)}
-                    </span>
-                  </>
-                ) : null}
-              </div>
-            )}
-            <div className="flex flex-col items-end">
-              <span className="text-xs text-muted-foreground mb-1">Due in:</span>
-              <div className="flex items-center gap-2">
-                {urgency === "critical" && (
-                  <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
-                )}
-                <span className="text-sm font-semibold text-foreground">
-                  {formatTimeRemaining(dueTimeLeft)}
-                </span>
+                <span className="text-xs text-muted-foreground mb-1">Due in:</span>
+                <div className="flex items-center gap-2">
+                  {urgency === "critical" && !isCompleted && (
+                    <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
+                  )}
+                  <span className="text-sm font-semibold text-foreground">
+                    {formatTimeRemaining(dueTimeLeft)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
