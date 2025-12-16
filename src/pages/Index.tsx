@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 import { DISCLAIMER_TEXT } from "@/lib/disclaimer-text";
 
 const SCHEDULE_URL = "/schedule.json";
@@ -267,6 +268,45 @@ const Index = () => {
 
   const upcomingCount = filteredDeadlinesWithPastDue.filter((d) => isWithinFiveDays(d.dueDate)).length;
 
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!scheduleData) return { overall: { total: 0, completed: 0, percentage: 0 }, courses: new Map() };
+
+    const courses = new Map<string, { total: number; completed: number; percentage: number }>();
+    let overallTotal = 0;
+    let overallCompleted = 0;
+
+    scheduleData.schedules.forEach((schedule) => {
+      let courseTotal = 0;
+      let courseCompleted = 0;
+
+      schedule.items.forEach((item) => {
+        courseTotal++;
+        overallTotal++;
+        const id = `${schedule.course_name}-${item.item}-${item.due_date}`;
+        if (completedItems.has(id)) {
+          courseCompleted++;
+          overallCompleted++;
+        }
+      });
+
+      courses.set(schedule.course_name, {
+        total: courseTotal,
+        completed: courseCompleted,
+        percentage: courseTotal > 0 ? Math.round((courseCompleted / courseTotal) * 100) : 0,
+      });
+    });
+
+    return {
+      overall: {
+        total: overallTotal,
+        completed: overallCompleted,
+        percentage: overallTotal > 0 ? Math.round((overallCompleted / overallTotal) * 100) : 0,
+      },
+      courses,
+    };
+  }, [scheduleData, completedItems]);
+
   const handleDisclaimerClose = () => {
     if (dontShowDisclaimer) {
       localStorage.setItem("disclaimerDismissed", "true");
@@ -327,6 +367,20 @@ const Index = () => {
               </p>
             )}
           </div>
+
+          {/* Overall Progress */}
+          {!loading && !error && (
+            <div className="max-w-md">
+              <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1.5">
+                <span>Overall Progress</span>
+                <span className="font-medium text-foreground">{stats.overall.percentage}%</span>
+              </div>
+              <Progress value={stats.overall.percentage} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-1.5">
+                {stats.overall.completed} of {stats.overall.total} tasks completed
+              </p>
+            </div>
+          )}
         </header>
 
         {/* Course Filter */}
@@ -345,25 +399,38 @@ const Index = () => {
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-72 p-3" align="start">
+              <PopoverContent className="w-80 p-3" align="start">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Select subjects</Label>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {courseNames.map((courseName) => (
-                      <div key={courseName} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={courseName}
-                          checked={selectedCourses.has(courseName)}
-                          onCheckedChange={() => toggleCourse(courseName)}
-                        />
-                        <Label
-                          htmlFor={courseName}
-                          className="text-sm font-normal cursor-pointer text-foreground flex-1"
-                        >
-                          {courseName}
-                        </Label>
-                      </div>
-                    ))}
+                    {courseNames.map((courseName) => {
+                      const courseStat = stats.courses.get(courseName);
+                      return (
+                        <div key={courseName} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={courseName}
+                            checked={selectedCourses.has(courseName)}
+                            onCheckedChange={() => toggleCourse(courseName)}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <Label
+                              htmlFor={courseName}
+                              className="text-sm font-normal cursor-pointer text-foreground block truncate"
+                            >
+                              {courseName}
+                            </Label>
+                            {courseStat && (
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <Progress value={courseStat.percentage} className="h-1 flex-1" />
+                                <span className="text-[10px] text-muted-foreground w-8 text-right">
+                                  {courseStat.percentage}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </PopoverContent>
