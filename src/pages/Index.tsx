@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useState } from "react";
-import { CalendarClock, GraduationCap, Loader2, ChevronDown } from "lucide-react";
+import { CalendarClock, GraduationCap, Loader2, ChevronDown, BookOpen } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
+import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -54,6 +55,11 @@ const Index = () => {
   const [dontShowDisclaimer, setDontShowDisclaimer] = useState(false);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
   const [scores, setScores] = useState<Record<string, number>>({});
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
+  const handleSubjectClick = (courseName: string) => {
+    setSelectedSubject(courseName);
+  };
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -391,6 +397,93 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Grade Sheet Modal */}
+      <Dialog open={selectedSubject !== null} onOpenChange={(open) => !open && setSelectedSubject(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-primary" />
+              {selectedSubject}
+            </DialogTitle>
+            <DialogDescription>
+              Grade sheet and task breakdown
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedSubject && (
+            <div className="mt-4">
+              <div className="rounded-md border">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50">
+                    <tr className="border-b">
+                      <th className="h-10 px-4 text-left font-medium text-muted-foreground">Task</th>
+                      <th className="h-10 px-4 text-left font-medium text-muted-foreground">Due Date</th>
+                      <th className="h-10 px-4 text-right font-medium text-muted-foreground">Weightage</th>
+                      <th className="h-10 px-4 text-center font-medium text-muted-foreground">Status</th>
+                      <th className="h-10 px-4 text-right font-medium text-muted-foreground">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedDeadlines
+                      .filter(d => d.courseName === selectedSubject)
+                      .map((deadline) => {
+                        const id = `${deadline.courseName}-${deadline.item}-${deadline.dueDate}`;
+                        const isCompleted = completedItems.has(id);
+                        const score = scores[id];
+
+                        return (
+                          <tr key={id} className={cn("border-b last:border-0 transition-colors hover:bg-muted/50", isCompleted && "bg-muted/20")}>
+                            <td className={cn("p-4 font-medium", isCompleted && "text-muted-foreground line-through")}>
+                              {deadline.item}
+                            </td>
+                            <td className="p-4 text-muted-foreground">
+                              {new Date(deadline.dueDate).toLocaleDateString()}
+                            </td>
+                            <td className="p-4 text-right font-mono">
+                              {deadline.weightage}
+                            </td>
+                            <td className="p-4 text-center">
+                              {isCompleted ? (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600">
+                                  Done
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-600">
+                                  Pending
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-4 text-right font-mono">
+                              {score !== undefined ? `${score}%` : "-"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row justify-between gap-4 bg-muted/30 p-4 rounded-lg">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Weightage</p>
+                  <p className="text-2xl font-bold">
+                    {sortedDeadlines
+                      .filter(d => d.courseName === selectedSubject)
+                      .reduce((acc, curr) => acc + parseFloat(curr.weightage.replace('%', '')), 0)}%
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Current Grade</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {stats.courses.get(selectedSubject)?.grade ?? 0}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Subtle gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
@@ -535,6 +628,7 @@ const Index = () => {
                 onToggleCompleted={() => toggleCompleted(id)}
                 score={scores[id]}
                 onScoreChange={(score) => handleScoreChange(id, score)}
+                onSubjectClick={handleSubjectClick}
               />
             );
           })}

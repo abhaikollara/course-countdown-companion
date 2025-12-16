@@ -16,6 +16,7 @@ interface DeadlineCardProps {
   onToggleCompleted?: () => void;
   score?: number;
   onScoreChange?: (score: number) => void;
+  onSubjectClick?: (courseName: string) => void;
 }
 
 interface TimeLeft {
@@ -62,6 +63,7 @@ const DeadlineCard = ({
   onToggleCompleted,
   score,
   onScoreChange,
+  onSubjectClick,
 }: DeadlineCardProps) => {
   // Calculate time left for both open and due dates
   const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() =>
@@ -186,7 +188,18 @@ const DeadlineCard = ({
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className={cn("w-2 h-2 rounded-full shrink-0", urgencyIndicator[urgency])} />
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+            <span
+              className={cn(
+                "text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 transition-colors",
+                onSubjectClick && "cursor-pointer hover:text-primary hover:underline"
+              )}
+              onClick={(e) => {
+                if (onSubjectClick) {
+                  e.stopPropagation();
+                  onSubjectClick(courseName);
+                }
+              }}
+            >
               <BookOpen className="w-3.5 h-3.5" />
               {courseName}
             </span>
@@ -274,7 +287,7 @@ const DeadlineCard = ({
               <CheckCircle className="w-5 h-5" />
               <span className="text-sm font-medium">Past Due</span>
             </div>
-          ) : (
+          ) : !isCompleted && (
             <div className="flex flex-col gap-3 items-end">
               {openDate && openDate.trim() !== "" && (
                 <div className="flex flex-col items-end">
