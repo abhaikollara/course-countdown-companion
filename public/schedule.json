@@ -51,9 +51,9 @@
         },
         {
           "item": "Graded Lab Assignment: Building Shell Scripts and Understanding System Calls",
-          "due_date": "2026-01-17T00:00:00+05:30",
+          "open_date": "2026-01-17T00:00:00+05:30",
           "weightage": "10%",
-          "open_date": "2026-02-05T23:59:00+05:30",
+          "due_date": "2026-02-05T23:59:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/NXR7M/graded-lab-assignment-building-shell-scripts-and-understanding-system-calls"
         }
       ]
