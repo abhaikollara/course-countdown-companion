@@ -19,20 +19,20 @@
           "due_date": "2025-12-31T23:59:00+05:30",
           "weightage": "6%",
           "open_date": "2025-12-27T18:00:00+05:30",
-          "url":"https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/3yHdH/graded-quiz-for-week-3-and-4"
+          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/3yHdH/graded-quiz-for-week-3-and-4"
         },
         {
           "item": "Graded Quiz for Week 5 and 6",
           "due_date": "2026-01-14T23:59:00+05:30",
           "weightage": "6%",
           "open_date": "2026-01-10T18:00:00+05:30",
-          "url":"https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/u5FYw/graded-quiz-for-week-5-and-6"
+          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/u5FYw/graded-quiz-for-week-5-and-6"
         },
         {
           "item": "Graded Lab Assignment: Modules 1-4",
-          "due_date": "2026-01-21T03:24:00+05:30",
+          "due_date": "2026-01-02T23:59:00+05:30",
           "weightage": "10%",
-          "open_date": "2026-01-02T15:26:00+05:30",
+          "open_date": "2025-12-20T15:26:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/q1iMs/graded-lab-assignment-modules-1-4"
         },
         {
@@ -51,9 +51,9 @@
         },
         {
           "item": "Graded Lab Assignment: Building Shell Scripts and Understanding System Calls",
-          "due_date": "2026-02-14T03:25:00+05:30",
+          "due_date": "2026-01-17T00:00:00+05:30",
           "weightage": "10%",
-          "open_date": "2026-02-06T15:25:00+05:30",
+          "open_date": "2026-02-05T23:59:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/NXR7M/graded-lab-assignment-building-shell-scripts-and-understanding-system-calls"
         }
       ]
@@ -81,7 +81,7 @@
           "due_date": "2025-12-31T23:59:00+05:30",
           "weightage": "6%",
           "open_date": "2025-12-27T00:00:00+05:30",
-          "url":"https://www.coursera.org/learn/data-structures-and-algorithms/assignment-submission/fOx2E/graded-quiz-for-week-3-and-4"
+          "url": "https://www.coursera.org/learn/data-structures-and-algorithms/assignment-submission/fOx2E/graded-quiz-for-week-3-and-4"
         },
         {
           "item": "Graded Quiz for Week 5 and 6",
