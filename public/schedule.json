@@ -22,18 +22,18 @@
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/3yHdH/graded-quiz-for-week-3-and-4"
         },
         {
-          "item": "Graded Quiz for Week 5 and 6",
-          "due_date": "2026-01-14T23:59:00+05:30",
-          "weightage": "6%",
-          "open_date": "2026-01-10T18:00:00+05:30",
-          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/u5FYw/graded-quiz-for-week-5-and-6"
-        },
-        {
           "item": "Graded Lab Assignment: Modules 1-4",
           "due_date": "2026-01-02T23:59:00+05:30",
           "weightage": "10%",
           "open_date": "2025-12-20T15:26:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/q1iMs/graded-lab-assignment-modules-1-4"
+        },
+        {
+          "item": "Graded Quiz for Week 5 and 6",
+          "due_date": "2026-01-14T23:59:00+05:30",
+          "weightage": "6%",
+          "open_date": "2026-01-10T18:00:00+05:30",
+          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/u5FYw/graded-quiz-for-week-5-and-6"
         },
         {
           "item": "Graded Quiz for Week 7 and 8",
@@ -43,18 +43,18 @@
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/TMJC4/graded-quiz-for-week-7-and-8"
         },
         {
+          "item": "Graded Lab Assignment: Building Shell Scripts and Understanding System Calls",
+          "due_date": "2026-02-05T23:59:00+05:30",
+          "weightage": "10%",
+          "open_date": "2026-01-17T00:00:00+05:30",
+          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/NXR7M/graded-lab-assignment-building-shell-scripts-and-understanding-system-calls"
+        },
+        {
           "item": "Graded Quiz for Week 9 and 10",
           "due_date": "2026-02-11T23:59:00+05:30",
           "weightage": "6%",
           "open_date": "2026-02-07T18:00:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/p57dd/graded-quiz-for-week-9-and-10"
-        },
-        {
-          "item": "Graded Lab Assignment: Building Shell Scripts and Understanding System Calls",
-          "open_date": "2026-01-17T00:00:00+05:30",
-          "weightage": "10%",
-          "due_date": "2026-02-05T23:59:00+05:30",
-          "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/NXR7M/graded-lab-assignment-building-shell-scripts-and-understanding-system-calls"
         }
       ]
     },
@@ -72,14 +72,14 @@
         {
           "item": "Graded Quiz for Week 3 and 4",
           "due_date": "2025-12-26T23:59:00+05:30",
-          "weightage": "7%",
+          "weightage": "6%",
           "open_date": "2025-12-20T00:00:00+05:30",
           "url": "https://www.coursera.org/learn/data-structures-and-algorithms/assignment-submission/fOx2E/graded-quiz-for-week-3-and-4"
         },
         {
           "item": "Auto graded assignment",
           "due_date": "2025-12-31T23:59:00+05:30",
-          "weightage": "6%",
+          "weightage": "7%",
           "open_date": "2025-12-27T00:00:00+05:30",
           "url": "https://www.coursera.org/learn/data-structures-and-algorithms/programming/gFu2m/auto-graded-assignment"
         },
@@ -125,13 +125,6 @@
           "url": "https://www.coursera.org/learn/general-biology/assignment-submission/VE5WU/graded-quiz-for-week-1-and-2"
         },
         {
-          "item": "Graded Quiz for Week 3 and 4",
-          "due_date": "2026-01-31T23:59:00+05:30",
-          "weightage": "6%",
-          "open_date": "2025-12-27T00:00:00+05:30",
-          "url": "https://www.coursera.org/learn/general-biology/assignment-submission/6NgUT/graded-quiz-for-week-3-and-4"
-        },
-        {
           "item": "Staff Graded Assessment",
           "due_date": "2026-01-07T23:59:00+05:30",
           "weightage": "10%",
@@ -153,8 +146,15 @@
           "url": "https://www.coursera.org/learn/general-biology/assignment-submission/stHd4/graded-quiz-for-week-7-and-8"
         },
         {
+          "item": "Graded Quiz for Week 3 and 4",
+          "due_date": "2026-01-31T23:59:00+05:30",
+          "weightage": "6%",
+          "open_date": "2025-12-27T00:00:00+05:30",
+          "url": "https://www.coursera.org/learn/general-biology/assignment-submission/6NgUT/graded-quiz-for-week-3-and-4"
+        },
+        {
           "item": "Staff Graded Assignment",
-          "due_date": "2026-02-06T16:24:00+05:30",
+          "due_date": "2026-02-06T23:59:00+05:30",
           "weightage": "10%",
           "open_date": "2026-01-30T03:25:00+05:30",
           "url": "https://www.coursera.org/learn/general-biology/assignment-submission/y369b/staff-graded-assignment"
