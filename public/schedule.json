@@ -5,6 +5,7 @@
   "schedules": [
     {
       "course_name": "Command Line Interfaces & Scripting",
+      "credits": 3,
       "course_name_short": "CLI",
       "items": [
         {
@@ -61,6 +62,7 @@
     {
       "course_name": "Data Structures and Algorithms",
       "course_name_short": "DSA",
+      "credits": 4,
       "items": [
         {
           "item": "Graded Quiz for Week 1 and 2",
@@ -116,6 +118,7 @@
     {
       "course_name": "General Biology",
       "course_name_short": "BIO",
+      "credits": 2,
       "items": [
         {
           "item": "Graded Quiz for Week 1 and 2",

@@ -25,6 +25,7 @@ interface ScheduleItem {
 interface Schedule {
   course_name: string;
   course_name_short: string;
+  credits?: number;
   items: ScheduleItem[];
 }
 
@@ -465,6 +466,11 @@ const Index = () => {
             </DialogTitle>
             <DialogDescription>
               Grade sheet and task breakdown
+              {scheduleData?.schedules.find(s => s.course_name === selectedSubject)?.credits && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                  {scheduleData.schedules.find(s => s.course_name === selectedSubject)?.credits} Credits
+                </span>
+              )}
             </DialogDescription>
           </DialogHeader>
 
