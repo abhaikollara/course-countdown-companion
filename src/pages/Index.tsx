@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { CalendarClock, GraduationCap, Loader2, ChevronDown, BookOpen } from "lucide-react";
 import DeadlineCard from "@/components/DeadlineCard";
 import { cn } from "@/lib/utils";
@@ -576,9 +577,16 @@ const Index = () => {
                 <span className="font-medium text-foreground">{stats.overall.percentage}%</span>
               </div>
               <Progress value={stats.overall.percentage} className="h-2" />
-              <p className="text-xs text-muted-foreground mt-1.5">
-                {stats.overall.completed} of {stats.overall.total} tasks completed
-              </p>
+              <div className="flex justify-between items-start mt-1.5">
+                <p className="text-xs text-muted-foreground">
+                  {stats.overall.completed} of {stats.overall.total} tasks completed
+                </p>
+                <Link to="/report-card">
+                  <Button variant="link" className="h-auto p-0 text-xs text-primary">
+                    View Report Card
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
         </header>
