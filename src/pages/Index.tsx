@@ -21,6 +21,7 @@ interface ScheduleItem {
   weightage: string;
   open_date: string;
   url?: string;
+  is_compre?: boolean;
 }
 
 interface Schedule {
@@ -44,6 +45,7 @@ interface DeadlineItem {
   weightage: string;
   openDate: string;
   url?: string;
+  isCompre?: boolean;
 }
 
 const Index = () => {
@@ -229,13 +231,20 @@ const Index = () => {
           weightage: item.weightage,
           openDate: item.open_date,
           url: item.url,
+          isCompre: item.is_compre,
         });
       });
     });
 
-    return allItems.sort(
-      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    );
+    return allItems.sort((a, b) => {
+      // Place compre items last
+      if (a.isCompre && !b.isCompre) return 1;
+      if (!a.isCompre && b.isCompre) return -1;
+      if (a.isCompre && b.isCompre) return 0; // Keep original order for multiple compre items
+
+      // Normal sort for non-compre items
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    });
   }, [scheduleData]);
 
   const filteredDeadlines = useMemo(() => {
@@ -318,7 +327,9 @@ const Index = () => {
     return time > now && time <= fiveDaysFromNow;
   };
 
-  const isPastDue = (dueDate: string) => {
+  const isPastDue = (dueDate: string, isCompre?: boolean) => {
+    if (isCompre) return false;
+    if (!dueDate) return false;
     return new Date(dueDate).getTime() <= now;
   };
 
@@ -326,7 +337,7 @@ const Index = () => {
     let result = filteredDeadlines;
 
     if (!showPastDue) {
-      result = result.filter((deadline) => !isPastDue(deadline.dueDate));
+      result = result.filter((deadline) => !isPastDue(deadline.dueDate, deadline.isCompre));
     }
 
     if (!showCompleted) {
@@ -701,6 +712,7 @@ const Index = () => {
                 score={scores[id]}
                 onScoreChange={(score) => handleScoreChange(id, score)}
                 onSubjectClick={handleSubjectClick}
+                isCompre={deadline.isCompre}
               />
             );
           })}

@@ -56,6 +56,11 @@
           "weightage": "6%",
           "open_date": "2026-02-07T18:00:00+05:30",
           "url": "https://www.coursera.org/learn/command-line-interfaces-and-scripting/assignment-submission/p57dd/graded-quiz-for-week-9-and-10"
+        },
+        {
+          "item": "Comprehensive examinations",
+          "weightage": "50%",
+          "is_compre": true
         }
       ]
     },
@@ -112,6 +117,11 @@
           "weightage": "6%",
           "open_date": "2026-02-07T00:00:00+05:30",
           "url": "https://www.coursera.org/learn/data-structures-and-algorithms/assignment-submission/8ZNhd/graded-quiz-for-week-9-and-10"
+        },
+        {
+          "item": "Comprehensive examinations",
+          "weightage": "50%",
+          "is_compre": true
         }
       ]
     },
@@ -168,6 +178,11 @@
           "weightage": "6%",
           "open_date": "2026-02-07T18:00:00+05:30",
           "url": "https://www.coursera.org/learn/general-biology/assignment-submission/B4tgn/graded-quiz-for-week-9-and-10"
+        },
+        {
+          "item": "Comprehensive examinations",
+          "weightage": "50%",
+          "is_compre": true
         }
       ]
     },
@@ -216,6 +231,11 @@
           "due_date": "2026-02-21T03:24:00+05:30",
           "weightage": "",
           "open_date": ""
+        },
+        {
+          "item": "Comprehensive examinations",
+          "weightage": "50%",
+          "is_compre": true
         }
       ]
     }

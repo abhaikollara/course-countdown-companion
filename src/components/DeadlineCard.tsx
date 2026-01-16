@@ -17,6 +17,7 @@ interface DeadlineCardProps {
   score?: number;
   onScoreChange?: (score: number) => void;
   onSubjectClick?: (courseName: string) => void;
+  isCompre?: boolean;
 }
 
 interface TimeLeft {
@@ -28,6 +29,7 @@ interface TimeLeft {
 }
 
 const calculateTimeLeft = (dueDate: string): TimeLeft => {
+  if (!dueDate) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
   const difference = new Date(dueDate).getTime() - new Date().getTime();
 
   if (difference <= 0) {
@@ -43,7 +45,8 @@ const calculateTimeLeft = (dueDate: string): TimeLeft => {
   };
 };
 
-const getUrgencyLevel = (timeLeft: TimeLeft): "critical" | "warning" | "normal" | "expired" => {
+const getUrgencyLevel = (timeLeft: TimeLeft, isCompre?: boolean): "critical" | "warning" | "normal" | "expired" => {
+  if (isCompre) return "normal";
   if (timeLeft.total <= 0) return "expired";
   if (timeLeft.days < 1) return "critical";
   if (timeLeft.days < 3) return "warning";
@@ -64,23 +67,28 @@ const DeadlineCard = ({
   score,
   onScoreChange,
   onSubjectClick,
+  isCompre,
 }: DeadlineCardProps) => {
   // Calculate time left for both open and due dates
   const [openTimeLeft, setOpenTimeLeft] = useState<TimeLeft>(() =>
-    openDate && openDate.trim() !== "" ? calculateTimeLeft(openDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
+    !isCompre && openDate && openDate.trim() !== "" ? calculateTimeLeft(openDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
   );
-  const [dueTimeLeft, setDueTimeLeft] = useState<TimeLeft>(calculateTimeLeft(dueDate));
+  const [dueTimeLeft, setDueTimeLeft] = useState<TimeLeft>(
+    !isCompre && dueDate ? calculateTimeLeft(dueDate) : { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 }
+  );
 
   // Update immediately when dates change
   useEffect(() => {
+    if (isCompre) return;
     if (openDate && openDate.trim() !== "") {
       setOpenTimeLeft(calculateTimeLeft(openDate));
     }
     setDueTimeLeft(calculateTimeLeft(dueDate));
-  }, [openDate, dueDate]);
+  }, [openDate, dueDate, isCompre]);
 
   // Update every second
   useEffect(() => {
+    if (isCompre) return;
     const timer = setInterval(() => {
       if (openDate && openDate.trim() !== "") {
         setOpenTimeLeft(calculateTimeLeft(openDate));
@@ -89,10 +97,10 @@ const DeadlineCard = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [openDate, dueDate]);
+  }, [openDate, dueDate, isCompre]);
 
   // Calculate urgency based on due date
-  const urgency = getUrgencyLevel(dueTimeLeft);
+  const urgency = getUrgencyLevel(dueTimeLeft, isCompre);
 
   // Parse weightage and check if it's high (>= 10%)
   const safeWeightage = weightage || "0%";
@@ -101,7 +109,7 @@ const DeadlineCard = ({
 
   // Check if item is currently open (after open_date and before due_date)
   const now = new Date().getTime();
-  const isOpenNow = openDate && openDate.trim() !== "" &&
+  const isOpenNow = !isCompre && openDate && openDate.trim() !== "" &&
     new Date(openDate).getTime() <= now &&
     new Date(dueDate).getTime() > now;
 
@@ -187,7 +195,9 @@ const DeadlineCard = ({
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className={cn("w-2 h-2 rounded-full shrink-0", urgencyIndicator[urgency])} />
+            {!isCompre && (
+              <span className={cn("w-2 h-2 rounded-full shrink-0", urgencyIndicator[urgency])} />
+            )}
             <span
               className={cn(
                 "text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 transition-colors",
@@ -206,14 +216,16 @@ const DeadlineCard = ({
                 <Info className="w-3 h-3 opacity-0 -ml-0.5 group-hover/subject:opacity-100 transition-opacity" />
               )}
             </span>
-            <span className={cn(
-              "text-xs font-semibold px-2 py-0.5 rounded",
-              isHighWeightage
-                ? "text-amber-600 bg-amber-500/20 border border-amber-500/30"
-                : "text-primary bg-primary/10"
-            )}>
-              {weightage}
-            </span>
+            {!isCompre && (
+              <span className={cn(
+                "text-xs font-semibold px-2 py-0.5 rounded",
+                isHighWeightage
+                  ? "text-amber-600 bg-amber-500/20 border border-amber-500/30"
+                  : "text-primary bg-primary/10"
+              )}>
+                {weightage}
+              </span>
+            )}
           </div>
 
           <h3 className={cn(
@@ -224,16 +236,20 @@ const DeadlineCard = ({
           </h3>
 
           <div className="space-y-1">
-            {openDate && openDate.trim() !== "" && (
-              <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 shrink-0" />
-                Opens: {formatDate(openDate)}
-              </p>
+            {!isCompre && (
+              <>
+                {openDate && openDate.trim() !== "" && (
+                  <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    Opens: {formatDate(openDate)}
+                  </p>
+                )}
+                <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  Due: {formatDate(dueDate)}
+                </p>
+              </>
             )}
-            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 shrink-0" />
-              Due: {formatDate(dueDate)}
-            </p>
           </div>
 
           {/* Score Input */}
@@ -311,22 +327,27 @@ const DeadlineCard = ({
                   ) : null}
                 </div>
               )}
-              <div className="flex flex-col items-end">
-                <span className="text-xs text-muted-foreground mb-1">Due in:</span>
-                <div className="flex items-center gap-2">
-                  {urgency === "critical" && !isCompleted && (
-                    <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
-                  )}
-                  <span className="text-sm font-semibold text-foreground">
-                    {formatTimeRemaining(dueTimeLeft)}
-                  </span>
+              {!isCompre && (
+                <div className="flex flex-col items-end">
+                  <span className="text-xs text-muted-foreground mb-1">Due in:</span>
+                  <div className="flex items-center gap-2">
+                    {urgency === "critical" && !isCompleted && (
+                      <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
+                    )}
+                    <span className="text-sm font-semibold text-foreground">
+                      {formatTimeRemaining(dueTimeLeft)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
+              {isCompre && (
+                <></>
+              )}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -17,6 +17,7 @@ interface ScheduleItem {
     weightage: string;
     open_date?: string;
     url?: string;
+    is_compre?: boolean;
 }
 
 interface Schedule {
@@ -33,6 +34,7 @@ interface DeadlineItem {
     weightage: string;
     openDate?: string;
     url?: string;
+    isCompre?: boolean;
 }
 
 interface ScheduleData {
@@ -151,13 +153,19 @@ const ReportCard = () => {
                     weightage: item.weightage,
                     openDate: item.open_date,
                     url: item.url,
+                    isCompre: item.is_compre,
                 });
             });
         });
 
-        return allItems.sort(
-            (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-        );
+        return allItems.sort((a, b) => {
+            // Place compre items last
+            if (a.isCompre && !b.isCompre) return 1;
+            if (!a.isCompre && b.isCompre) return -1;
+            if (a.isCompre && b.isCompre) return 0;
+
+            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        });
     }, [scheduleData]);
 
     // Calculate statistics (reused logic)
@@ -334,7 +342,11 @@ const ReportCard = () => {
                                                             {deadline.item}
                                                         </td>
                                                         <td className="p-4 text-muted-foreground hidden sm:table-cell">
-                                                            {new Date(deadline.dueDate).toLocaleDateString()}
+                                                            {deadline.isCompre ? (
+                                                                <span className="italic">Comprehensive Exam</span>
+                                                            ) : (
+                                                                deadline.dueDate ? new Date(deadline.dueDate).toLocaleDateString() : "-"
+                                                            )}
                                                         </td>
                                                         <td className="p-4 text-right font-mono hidden sm:table-cell">
                                                             {deadline.weightage}
